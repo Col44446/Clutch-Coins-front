@@ -13,7 +13,7 @@ const Footer = () => {
             <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6">
                 {/* Company Info Section */}
                 <section className="border-l-4 border-blue-800 pl-3" aria-labelledby="company-heading">
-                    <h3 id="company-heading" className="text-xl font-bold text-white mb-4">GameTopup</h3>
+                    <h3 id="company-heading" className="text-xl font-bold text-white mb-4">ClutchCoins</h3>
                     <nav aria-label="Company links">
                         <ul className="space-y-2 text-sm">
                             <li>
@@ -31,7 +31,11 @@ const Footer = () => {
                                     Privacy Policy
                                 </Link>
                             </li>
-                            <li><a href="/security" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">Secure Payments</a></li>
+                            <li>
+                                <Link to="/security" className="hover:text-cyan-400 transition-colors duration-200">
+                                    Secure Payments
+                                </Link>
+                            </li>
                         </ul>
                     </nav>
                 </section>
@@ -80,7 +84,7 @@ const Footer = () => {
                                     <FontAwesomeIcon icon={faWhatsapp} className="mr-2 text-cyan-400" aria-hidden="true" /> WhatsApp Support
                                 </a>
                             </li>
-                            <li><a href="mailto:support@gametopup.com" className="hover:text-cyan-400 transition-colors duration-200">support@gametopup.com</a></li>
+                            <li><a href="mailto:support@clutchcoins.com" className="hover:text-cyan-400 transition-colors duration-200">support@clutchcoins.com</a></li>
                             <li>
                                 <a href="https://discord.gg/gametopup" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">
                                     Join Our Discord
@@ -96,11 +100,11 @@ const Footer = () => {
                     <nav aria-label="Partnership links">
                         <ul className="space-y-2 text-sm">
                             <li>
-                                <a href="/partner" className="inline-block bg-blue-700 text-white px-4 py-1.5 rounded-full hover:bg-blue-600 transition-all duration-200" rel="nofollow">
+                                <Link to="/partner" className="inline-block bg-blue-700 text-white px-4 py-1.5 rounded-full hover:bg-blue-600 transition-all duration-200">
                                     Become a Partner
-                                </a>
+                                </Link>
                             </li>
-                            <li><a href="mailto:partners@gametopup.com" className="hover:text-cyan-400 transition-colors duration-200">partners@gametopup.com</a></li>
+                            <li><a href="mailto:partners@clutchcoins.com" className="hover:text-cyan-400 transition-colors duration-200">partners@clutchcoins.com</a></li>
                         </ul>
                     </nav>
                 </section>
@@ -137,30 +141,30 @@ const Footer = () => {
                 <div className="mb-4 sm:mb-0 flex items-center space-x-4">
                     <span className="font-medium">Connect With Us</span>
                     <div className="flex space-x-3">
-                        <a href="https://facebook.com/gametopup" className="hover:text-cyan-400 transition-colors duration-200" aria-label="Follow us on Facebook" rel="nofollow">
+                        <a href="https://facebook.com/clutchcoins" className="hover:text-cyan-400 transition-colors duration-200" aria-label="Follow us on Facebook" rel="nofollow">
                             <FontAwesomeIcon icon={faFacebookF} size="lg" aria-hidden="true" />
                         </a>
-                        <a href="https://twitter.com/gametopup" className="hover:text-cyan-400 transition-colors duration-200" aria-label="Follow us on Twitter" rel="nofollow">
+                        <a href="https://twitter.com/clutchcoins" className="hover:text-cyan-400 transition-colors duration-200" aria-label="Follow us on Twitter" rel="nofollow">
                             <FontAwesomeIcon icon={faTwitter} size="lg" aria-hidden="true" />
                         </a>
-                        <a href="https://instagram.com/gametopup" className="hover:text-cyan-400 transition-colors duration-200" aria-label="Follow us on Instagram" rel="nofollow">
+                        <a href="https://instagram.com/clutchcoins" className="hover:text-cyan-400 transition-colors duration-200" aria-label="Follow us on Instagram" rel="nofollow">
                             <FontAwesomeIcon icon={faInstagram} size="lg" aria-hidden="true" />
                         </a>
-                        <a href="https://reddit.com/r/gametopup" className="hover:text-cyan-400 transition-colors duration-200" aria-label="Follow us on Reddit" rel="nofollow">
+                        <a href="https://reddit.com/r/clutchcoins" className="hover:text-cyan-400 transition-colors duration-200" aria-label="Follow us on Reddit" rel="nofollow">
                             <FontAwesomeIcon icon={faReddit} size="lg" aria-hidden="true" />
                         </a>
                     </div>
                 </div>
                 <nav aria-label="Additional links">
                     <div className="flex items-center space-x-4">
-                        <a href="https://trustpilot.com/review/gametopup.com" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">Rate Us on Trustpilot</a>
-                        <a href="mailto:support@gametopup.com" className="hover:text-cyan-400 transition-colors duration-200">Get in Touch</a>
+                        <a href="https://trustpilot.com/review/clutchcoins.com" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">Rate Us on Trustpilot</a>
+                        <a href="mailto:support@clutchcoins.com" className="hover:text-cyan-400 transition-colors duration-200">Get in Touch</a>
                     </div>
                 </nav>
             </div>
 
             <div className="mt-6 text-center text-xs text-gray-400">
-                © 2025 GameTopup Solutions PTE. LTD. All Rights Reserved. | Your Gaming Recharge Hub!
+                © 2025 ClutchCoins Solutions PTE. LTD. All Rights Reserved. | Your Gaming Recharge Hub!
             </div>
         </footer>
     );

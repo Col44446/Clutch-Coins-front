@@ -63,9 +63,9 @@ function MainCard() {
   }, []);
 
   return (
-    <section className="flex flex-col justify-center items-center min-h-screen bg-gray-900 text-white px-2 sm:px-4">
+    <section className="flex flex-col justify-center items-center min-h-screen bg-gray-900 text-white px-2 sm:px-4 md:px-6 lg:px-8">
       {/* Carousel container */}
-      <div className="mt-20 sm:mt-40 relative w-full max-w-7xl h-56 sm:h-96 overflow-hidden rounded-xl sm:rounded-3xl">
+      <div className="mt-16 sm:mt-20 md:mt-24 lg:mt-32 xl:mt-40 relative w-full max-w-7xl h-48 sm:h-64 md:h-80 lg:h-96 overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl lg:rounded-3xl">
         {/* Navigation Arrows */}
         <button
           onClick={prevSlide}
@@ -101,7 +101,7 @@ function MainCard() {
               src={img.src}
               alt={img.alt}
               onClick={() => handleImageClick(img.gameId)}
-              className={`absolute top-0 left-0 w-full h-full object-cover rounded-xl sm:rounded-3xl shadow-xl sm:shadow-2xl border border-white/30 transform transition-all duration-500 ease-in-out cursor-pointer hover:scale-105 ${position}`}
+              className={`absolute top-0 left-0 w-full h-full object-cover rounded-lg sm:rounded-xl md:rounded-2xl lg:rounded-3xl shadow-lg sm:shadow-xl md:shadow-2xl border border-white/30 transform transition-all duration-500 ease-in-out cursor-pointer hover:scale-105 ${position}`}
               style={{ aspectRatio: '9/16' }}
             />
           );
@@ -114,7 +114,7 @@ function MainCard() {
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`h-1 rounded-full transition-all duration-300 hover:bg-sky-300 ${index === currentIndex ? 'bg-sky-400 w-6 sm:w-8' : 'bg-gray-500 w-3 sm:w-4'
+            className={`h-1 rounded-full transition-all duration-300 hover:bg-sky-300 ${index === currentIndex ? 'bg-sky-400 w-4 sm:w-6 md:w-8' : 'bg-gray-500 w-2 sm:w-3 md:w-4'
               }`}
             aria-label={`Go to slide ${index + 1}`}
           ></button>

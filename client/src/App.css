@@ -1,18 +1,40 @@
 @import "tailwindcss";
 
-/* Hide default scrollbars for all elements */
+/* Responsive base styles */
 * {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
+  box-sizing: border-box;
 }
 
 *::-webkit-scrollbar {
   display: none; /* WebKit */
 }
 
-/* Custom scrollbar for the main body */
-body {
+/* Responsive body styles */
+html, body {
   overflow-x: hidden;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Responsive font scaling */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 1280px) {
+  html {
+    font-size: 20px;
+  }
 }
 
 /* Custom scrollbar container */
@@ -92,4 +114,113 @@ body, html {
 .modal-scroll::-webkit-scrollbar-thumb:hover,
 .dropdown-scroll::-webkit-scrollbar-thumb:hover {
   background: #0891b2;
+}
+
+/* Responsive utilities and mobile optimizations */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Improved button touch targets for mobile */
+@media (max-width: 768px) {
+  button, .btn, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+}
+
+/* Responsive text scaling */
+.text-responsive-xs { font-size: clamp(0.75rem, 2vw, 0.875rem); }
+.text-responsive-sm { font-size: clamp(0.875rem, 2.5vw, 1rem); }
+.text-responsive-base { font-size: clamp(1rem, 3vw, 1.125rem); }
+.text-responsive-lg { font-size: clamp(1.125rem, 3.5vw, 1.25rem); }
+.text-responsive-xl { font-size: clamp(1.25rem, 4vw, 1.5rem); }
+.text-responsive-2xl { font-size: clamp(1.5rem, 5vw, 2rem); }
+.text-responsive-3xl { font-size: clamp(1.875rem, 6vw, 2.5rem); }
+
+/* Container responsive padding */
+.container-responsive {
+  padding-left: clamp(1rem, 4vw, 2rem);
+  padding-right: clamp(1rem, 4vw, 2rem);
+}
+
+/* Responsive spacing utilities */
+.gap-responsive { gap: clamp(0.5rem, 2vw, 1.5rem); }
+.p-responsive { padding: clamp(0.75rem, 3vw, 1.5rem); }
+.m-responsive { margin: clamp(0.75rem, 3vw, 1.5rem); }
+
+/* Mobile-first animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid #06b6d4;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .text-white {
+    color: #ffffff !important;
+  }
+  
+  .bg-gray-800 {
+    background-color: #000000 !important;
+  }
+  
+  .border-cyan-600 {
+    border-color: #00ffff !important;
+  }
+}
+
+/* Image optimization and lazy loading styles */
+.lazy-loading {
+  filter: blur(5px);
+  transition: filter 0.3s ease;
+}
+
+.lazy-loaded {
+  filter: none;
+}
+
+/* Performance optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .bg-gradient-to-br,
+  .bg-gradient-to-r {
+    background: white !important;
+  }
 }

@@ -13,10 +13,11 @@ const Home = () => {
       <MainCard />
       <PopularGames />
       <section
-        className="bg-gray-800 p-4"
+        className="bg-gray-800 p-4 sm:p-6 md:p-8"
         aria-label="Platform Features"
       >
-        <div className="flex flex-col sm:flex-row justify-around items-center gap-4 sm:gap-0">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row justify-around items-center gap-4 sm:gap-6 md:gap-8">
 
           {/* Feature 1 */}
           <article className="flex items-center text-white p-3 bg-gray-800 bg-opacity-80 hover:bg-opacity-100 transition duration-300 rounded-lg w-full sm:w-auto">
@@ -60,6 +61,7 @@ const Home = () => {
             </div>
           </article>
 
+          </div>
         </div>
       </section>
 

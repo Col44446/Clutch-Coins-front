@@ -144,20 +144,20 @@ function PopularGames() {
 
     return (
         <section
-            className="bg-gradient-to-br from-gray-950 via-gray-900 to-slate-900 p-4 rounded-2xl shadow-4xl"
+            className="bg-gradient-to-br from-gray-950 via-gray-900 to-slate-900 p-4 sm:p-6 md:p-8 rounded-2xl shadow-4xl container-responsive"
             aria-labelledby="popular-games-title"
         >
             {/* Header */}
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
                 <h2
                     id="popular-games-title"
-                    className="m-6 text-2xl sm:text-3xl font-extrabold text-white tracking-tight drop-shadow-md"
+                    className="text-responsive-2xl font-extrabold text-white tracking-tight drop-shadow-md"
                 >
                     Trending Games
                 </h2>
                 <a
-                    href="/game"
-                    className="px-4 py-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-blue-800 text-white text-sm font-semibold rounded-full shadow-md hover:from-cyan-300 hover:via-blue-400 hover:to-blue-500 hover:shadow-lg hover:scale-105 transform transition-all duration-300 ease-in-out"
+                    href="/games"
+                    className="px-4 py-2 sm:px-6 sm:py-2 bg-gradient-to-r from-cyan-500 via-blue-500 to-blue-800 text-white text-responsive-sm font-semibold rounded-full shadow-md hover:from-cyan-300 hover:via-blue-400 hover:to-blue-500 hover:shadow-lg hover:scale-105 transform transition-all duration-300 ease-in-out touch-manipulation"
                     aria-label="Explore more trending games"
                 >
                     Explore →

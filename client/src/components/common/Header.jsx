@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -230,9 +231,9 @@ function Header() {
               >
                 <Link to="/" className="block">
                   <img 
-                    src="/src/assets/clutch-coins-logo.svg" 
+                    src="/public/favicon.svg" 
                     alt="Clutch Coins Logo" 
-                    className="w-12 h-12 sm:w-14 sm:h-14 object-contain filter brightness-110"
+                    className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 object-contain filter brightness-110"
                   />
                 </Link>
               </motion.div>
@@ -241,7 +242,7 @@ function Header() {
               <div className="flex flex-col items-start">
                 <Link
                   to="/"
-                  className="text-2xl sm:text-3xl font-bold text-white hover:text-cyan-300 transition-colors duration-200"
+                  className="text-lg sm:text-2xl md:text-3xl font-bold text-white hover:text-cyan-300 transition-colors duration-200"
                 >
                   Clutch <span className="text-cyan-500">Coins</span>
                 </Link>
@@ -264,7 +265,7 @@ function Header() {
                 animate="pulse"
                 whileHover="hover"
                 whileTap="tap"
-                className="flex items-center gap-1.5 bg-green-600 text-white text-sm font-medium px-3 py-1.5 rounded-full hover:bg-green-500 transition-colors duration-200"
+                className="flex items-center gap-1.5 bg-green-600 text-white text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 sm:py-1.5 rounded-full hover:bg-green-500 transition-colors duration-200"
                 aria-label="Open live chat"
               >
                 <MessageCircle className="w-5 h-5" />

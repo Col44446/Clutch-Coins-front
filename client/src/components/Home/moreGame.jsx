@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import game1 from '../../assets/temp-28.jpg'; // Adjust paths based on your project
 import game2 from '../../assets/temp-29.jpg';
 import game3 from '../../assets/temp-30.jpg';
@@ -119,14 +120,14 @@ const GameCard = () => {
     const displayedGames = showAll ? games : games.slice(0, 4);
 
     return (
-        <section className="bg-gradient-to-br from-gray-950 via-slate-950 to-blue-950 min-h-screen flex flex-col items-start justify-center p-6 relative overflow-hidden">
-            <h1 className="m-6 text-2xl sm:text-3xl font-extrabold text-white tracking-tight drop-shadow-md">
+        <section className="bg-gradient-to-br from-gray-950 via-slate-950 to-blue-950 min-h-screen flex flex-col items-start justify-center container-responsive p-responsive relative overflow-hidden">
+            <h1 className="text-responsive-2xl font-extrabold text-white tracking-tight drop-shadow-md mb-6">
                 Games For You
             </h1>
-            <div className='bg-gray-900 p-4 m-2 rounded-2xl'>
+            <div className='bg-gray-900 p-responsive rounded-2xl w-full'>
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none"></div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-responsive max-w-7xl mx-auto">
                     {displayedGames.map((game, index) => (
                         <article
                             key={index}
@@ -134,18 +135,18 @@ const GameCard = () => {
                             onClick={() => handleGameClick(game.id)}
                         >
                             {/* Image with border */}
-                            <div className="border-2 border-cyan-600/50 hover:border-cyan-300 transition-colors duration-300 rounded-xl overflow-hidden">
+                            <div className="border-2 border-cyan-600/50 hover:border-cyan-300 transition-colors duration-300 rounded-xl overflow-hidden touch-manipulation">
                                 <img
                                     src={game.image}
                                     alt={`${game.title} game cover`}
-                                    className="w-full h-58 object-cover hover:scale-110 transition-transform duration-300"
+                                    className="w-full h-32 sm:h-40 md:h-48 lg:h-56 object-cover hover:scale-110 transition-transform duration-300"
                                     loading="lazy"
                                 />
                             </div>
 
                             {/* Title below the image */}
                             <div className="p-2 text-center">
-                                <h2 className="text-md font-bold text-white line-clamp-1">
+                                <h2 className="text-responsive-sm font-bold text-white line-clamp-1">
                                     {game.title}
                                 </h2>
                             </div>
@@ -156,7 +157,7 @@ const GameCard = () => {
                 <div className="mt-6 text-center w-full max-w-7xl mx-auto">
                     <button 
                         onClick={() => setShowAll(!showAll)}
-                        className="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-800 text-white font-bold text-md rounded-full shadow-[0_0_5px_rgba(0,255,255,0.5)] hover:bg-gradient-to-r hover:from-cyan-900 hover:to-blue-500 transition-colors duration-300"
+                        className="px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-800 text-white font-bold text-responsive-sm rounded-full shadow-[0_0_5px_rgba(0,255,255,0.5)] hover:bg-gradient-to-r hover:from-cyan-900 hover:to-blue-500 transition-colors duration-300 touch-manipulation min-h-[44px]"
                     >
                         {showAll ? 'Show Less' : 'View More'}
                     </button>

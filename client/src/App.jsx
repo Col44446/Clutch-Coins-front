@@ -1,17 +1,20 @@
-import { Routes, Route } from "react-router-dom";
-import "./App.css";
+import React, { Suspense, lazy } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
+import Header from './components/common/Header';
+import Footer from './components/common/Footer';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import SEOHead from './components/common/SEOHead';
+import CustomScrollbar from "./components/common/CustomScrollbar";
+import './App.css';
+
+// Main Pages
+import Home from './pages/Home';
+import AccountPage from './pages/Account/AccountPage';
+import CartPage from './pages/Cart/CartPage';
+import AdminDashboard from './pages/Admin/AdminDashboard';
 
 // Common Components
-import Header from "./components/common/Header";
-import Footer from "./components/common/Footer";
-import ErrorBoundary from "./components/common/ErrorBoundary";
-import CustomScrollbar from "./components/common/CustomScrollbar";
-
-// Pages
-import Home from "./pages/Home.jsx";
-import AccountPage from "./pages/Account/AccountPage";
-import CartPage from "./pages/Cart/CartPage";
-import AdminDashboard from "./pages/Admin/AdminDashboard";
 import UserDashboard from "./pages/User/UserDashboard";
 import CreateBlog from "./pages/Admin/PostBlog";
 import AddGame from "./pages/Admin/addGame";
