@@ -1,26 +1,53 @@
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
+
+// Common Components
 import Header from "./components/common/Header";
-import { Home } from "./pages/Home";
+import Footer from "./components/common/Footer";
+import ErrorBoundary from "./components/common/ErrorBoundary";
+import CustomScrollbar from "./components/common/CustomScrollbar";
+
+// Pages
+import Home from "./pages/Home.jsx";
+import AccountPage from "./pages/Account/AccountPage";
+import CartPage from "./pages/Cart/CartPage";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import UserDashboard from "./pages/User/UserDashboard";
 import CreateBlog from "./pages/Admin/PostBlog";
-import BlogsList from "./components/BlogList";
-import AdminRoute from "./components/AdminRoute"; // 🔹 Guard import
-import Footer from "./components/common/Footer";
 import AddGame from "./pages/Admin/addGame";
 import AllGames from "./pages/Admin/AllGames";
 import AllGame from "./pages/AllGames";
+
+// Purchase Pages
+import PaymentGateway from "./pages/Purchase/PaymentGateway";
+import PurchaseSuccess from "./pages/Purchase/PurchaseSuccess";
+
+// Components
+import BlogsList from "./components/BlogList";
 import GameDetails from "./components/GameSection/GameDetails";
+import StaticGameDetails from "./components/GameSection/StaticGameDetails";
 import Login from "./components/Login";
 import Signup from "./components/LogSign";
 import OTPVerify from "./components/OTPVerify";
+import AdminRoute from "./components/AdminRoute";
+
+// Policy & Info Pages
+import Terms from './components/Policies/Terms';
+import Privacy from './components/Policies/Privacy';
+import ReturnPolicy from './components/Policies/ReturnPolicy';
+import OurStory from './components/About/OurStory';
+import PaymentOptions from './pages/PaymentOptions';
+import FAQ from './pages/FAQ';
+import HowToUse from './pages/HowToUse';
+import DeliveryInfo from './pages/DeliveryInfo';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <Header />
-      <Routes>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gray-900 text-white">
+        <Header />
+        <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -28,53 +55,41 @@ function App() {
         <Route path="/otp-verify" element={<OTPVerify />} />
         <Route path="/blogs" element={<BlogsList />} />
         <Route path="/user-dashboard" element={<UserDashboard />} />
+        <Route path="/account" element={<AccountPage />} />
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/games" element={<AllGame />} />
-        <Route path="/games/:id" element={<GameDetails />} /> {/* 🔹 New route for GameDetails */}
-
+        <Route path="/game/:id" element={<StaticGameDetails />} />
+        
+        {/* Purchase Routes */}
+        <Route path="/payment" element={<PaymentGateway />} />
+        <Route path="/purchase-success" element={<PurchaseSuccess />} />
+        
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/returns" element={<ReturnPolicy />} />
+        <Route path="/about" element={<OurStory />} />
+        <Route path="/payments" element={<PaymentOptions />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/guide" element={<HowToUse />} />
+        <Route path="/shipping" element={<DeliveryInfo />} />
+        
         {/* Protected Admin Routes */}
         <Route
           path="/admin-dashboard"
-          element={
-            <AdminRoute>
-              <AdminDashboard />
-            </AdminRoute>
-          }
+          element={<AdminRoute><AdminDashboard /></AdminRoute>}
         />
-        <Route
-          path="/blog-post"
-          element={
-            <AdminRoute>
-              <CreateBlog />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/admin/games"
-          element={
-            <AdminRoute>
-              <AllGames />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/admin/games/add"
-          element={
-            <AdminRoute>
-              <AddGame />
-            </AdminRoute>
-          }
-        />
-        <Route
-          path="/admin/games/edit/:id"
-          element={
-            <AdminRoute>
-              <AddGame isEdit={true} />
-            </AdminRoute>
-          }
-        />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/blog-post" element={<AdminRoute><CreateBlog /></AdminRoute>} />
+        <Route path="/admin/game" element={<AdminRoute><AllGames /></AdminRoute>} />
+        <Route path="/admin/game/add" element={<AdminRoute><AddGame /></AdminRoute>} />
+        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        
+        {/* 404 Catch-all route */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
+      <CustomScrollbar />
     </div>
+    </ErrorBoundary>
   );
 }
 

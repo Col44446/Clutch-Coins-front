@@ -14,7 +14,6 @@ export default function CouponCode() {
 
     const handleClaim = (id) => {
         setClaimedId(id);
-        console.log(`Claimed coupon with ID: ${id}`);
         // Add your claim logic here (e.g., API call)
         setTimeout(() => setClaimedId(null), 1500); // Reset after animation
     };

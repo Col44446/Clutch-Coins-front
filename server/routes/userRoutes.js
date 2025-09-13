@@ -2,7 +2,9 @@ const express = require("express");
 const passport = require("passport");
 const router = express.Router();
 const { signupRequest, verifyOTP, login } = require("../controllers/userControler");
-const { logout } = require("../controllers/logoutController"); // ⬅️ import
+const { logout } = require("../controllers/logoutController");
+const { getUserPurchases, getUserProfile, updateUserProfile } = require("../controllers/userController");
+const auth = require("../middleware/auth");
 
 // Signup routes
 router.post("/signup/request", signupRequest);
@@ -12,6 +14,11 @@ router.post("/signup/verify", verifyOTP);
 router.post("/login", login);
 
 router.post("/logout", logout);
+
+// User profile and purchase routes
+router.get("/profile", auth, getUserProfile);
+router.put("/profile", auth, updateUserProfile);
+router.get("/purchases", auth, getUserPurchases);
 
 // Google auth
 router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));

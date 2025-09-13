@@ -13,6 +13,7 @@ const gameRoutes = require("./routes/gameRoutes");
 const userRoutes = require("./routes/userRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const cartRoutes = require("./routes/cartRoutes");
 const errorHandler = require("./middleware/errorHandler");
 
 require("./config/passport");
@@ -47,6 +48,7 @@ app.use("/api/games", gameRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/cart", cartRoutes);
 
 // Error handler
 app.use(errorHandler);

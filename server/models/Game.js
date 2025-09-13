@@ -15,6 +15,7 @@ const gameSchema = new mongoose.Schema({
   title: { type: String, required: true },
   publisher: { type: String, required: true },
   description: { type: String, required: true },
+  pageName: { type: String, required: true, unique: true }, // For URL routing
   offers: [offerSchema], // Array of { key, value }
   currencies: [currencySchema]
 }, { timestamps: true });

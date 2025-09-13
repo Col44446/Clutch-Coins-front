@@ -1,17 +1,16 @@
 import React from 'react'
 import MainCard from "../components/Home/mainCard"
-import Offers from '../components/Home/Offers'
 import PopularGames from '../components/Home/PopularGame'
 import lightningIcon from '../assets/temp-25.png';
 import treasureIcon from '../assets/temp-26.png';
 import shieldIcon from '../assets/temp-27.png';
 import GameCard from '../components/Home/moreGame';
 import PaymentSlider from '../components/Home/paymentSlider';
-export const Home = () => {
+
+const Home = () => {
   return (
     <div>
       <MainCard />
-      <Offers />
       <PopularGames />
       <section
         className="bg-gray-800 p-4"
@@ -69,3 +68,5 @@ export const Home = () => {
     </div>
   )
 }
+
+export default Home;

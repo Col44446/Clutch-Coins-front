@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookF, faTwitter, faInstagram, faReddit, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import p1 from '../../assets/p1.png';
@@ -15,11 +16,22 @@ const Footer = () => {
                     <h3 id="company-heading" className="text-xl font-bold text-white mb-4">GameTopup</h3>
                     <nav aria-label="Company links">
                         <ul className="space-y-2 text-sm">
-                            <li><a href="/about" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">Our Story</a></li>
-                            <li><a href="/terms" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">Terms of Service</a></li>
+                            <li>
+                                <Link to="/about" className="hover:text-cyan-400 transition-colors duration-200">
+                                    Our Story
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/terms" className="hover:text-cyan-400 transition-colors duration-200">
+                                    Terms of Service
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/privacy" className="hover:text-cyan-400 transition-colors duration-200">
+                                    Privacy Policy
+                                </Link>
+                            </li>
                             <li><a href="/security" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">Secure Payments</a></li>
-                            <li><a href="/privacy" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">Privacy Notice</a></li>
-                            <li><a href="/kyc" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">KYC Compliance</a></li>
                         </ul>
                     </nav>
                 </section>
@@ -29,11 +41,31 @@ const Footer = () => {
                     <h3 id="support-heading" className="text-xl font-bold text-white mb-4">Support</h3>
                     <nav aria-label="Support links">
                         <ul className="space-y-2 text-sm">
-                            <li><a href="/guide" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">How to Use</a></li>
-                            <li><a href="/shipping" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">Delivery Info</a></li>
-                            <li><a href="/payments" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">Payment Options</a></li>
-                            <li><a href="/returns" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">Return Policy</a></li>
-                            <li><a href="/faq" className="hover:text-cyan-400 transition-colors duration-200" rel="nofollow">FAQs</a></li>
+                            <li>
+                                <Link to="/guide" className="hover:text-cyan-400 transition-colors duration-200">
+                                    How to Use
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/shipping" className="hover:text-cyan-400 transition-colors duration-200">
+                                    Delivery Info
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/payments" className="hover:text-cyan-400 transition-colors duration-200">
+                                    Payment Options
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/returns" className="hover:text-cyan-400 transition-colors duration-200">
+                                    Return Policy
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/faq" className="hover:text-cyan-400 transition-colors duration-200">
+                                    FAQs
+                                </Link>
+                            </li>
                         </ul>
                     </nav>
                 </section>

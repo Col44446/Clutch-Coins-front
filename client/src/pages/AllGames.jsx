@@ -4,6 +4,129 @@ import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
 
+// Static games data matching homepage dummy games
+const staticGames = [
+  {
+    _id: 'speed-racing',
+    title: 'Speed Racing',
+    publisher: 'Velocity Studios',
+    image: '/src/assets/temp-11.jpg',
+    pageName: 'speed-racing'
+  },
+  {
+    _id: 'adventure-world',
+    title: 'Adventure World',
+    publisher: 'Quest Games',
+    image: '/src/assets/temp-12.jpg',
+    pageName: 'adventure-world'
+  },
+  {
+    _id: 'puzzle-master',
+    title: 'Puzzle Master',
+    publisher: 'Brain Games Inc',
+    image: '/src/assets/temp-13.jpg',
+    pageName: 'puzzle-master'
+  },
+  {
+    _id: 'strategy-empire',
+    title: 'Strategy Empire',
+    publisher: 'Empire Studios',
+    image: '/src/assets/temp-14.jpg',
+    pageName: 'strategy-empire'
+  },
+  {
+    _id: 'fantasy-rpg',
+    title: 'Fantasy RPG',
+    publisher: 'Mythic Games',
+    image: '/src/assets/temp-15.jpg',
+    pageName: 'fantasy-rpg'
+  },
+  {
+    _id: 'sports-champions',
+    title: 'Sports Champions',
+    publisher: 'Athletic Games',
+    image: '/src/assets/temp-16.jpg',
+    pageName: 'sports-champions'
+  },
+  {
+    _id: 'action-hero',
+    title: 'Action Hero',
+    publisher: 'Hero Studios',
+    image: '/src/assets/temp-17.jpg',
+    pageName: 'action-hero'
+  },
+  {
+    _id: 'warrior-quest',
+    title: 'Warrior Quest',
+    publisher: 'Epic Games Studio',
+    image: '/src/assets/temp-18.png',
+    pageName: 'warrior-quest'
+  },
+  {
+    _id: 'elite-shooter',
+    title: 'Elite Shooter',
+    publisher: 'Combat Studios',
+    image: '/src/assets/temp-19.png',
+    pageName: 'elite-shooter'
+  },
+  {
+    _id: 'life-simulator',
+    title: 'Life Simulator',
+    publisher: 'Reality Games',
+    image: '/src/assets/temp-20.png',
+    pageName: 'life-simulator'
+  },
+  {
+    _id: 'horror-nights',
+    title: 'Horror Nights',
+    publisher: 'Nightmare Studios',
+    image: '/src/assets/temp-21.png',
+    pageName: 'horror-nights'
+  },
+  {
+    _id: 'survival-island',
+    title: 'Survival Island',
+    publisher: 'Wilderness Games',
+    image: '/src/assets/temp-22.png',
+    pageName: 'survival-island'
+  },
+  {
+    _id: 'battlegrounds-mobile',
+    title: 'Battlegrounds Mobile India',
+    publisher: 'Krafton',
+    image: '/src/assets/temp-28.jpg',
+    pageName: 'battlegrounds-mobile'
+  },
+  {
+    _id: 'valorant-tactical',
+    title: 'Valorant',
+    publisher: 'Riot Games',
+    image: '/src/assets/temp-29.jpg',
+    pageName: 'valorant-tactical'
+  },
+  {
+    _id: 'roblox-platform',
+    title: 'Roblox',
+    publisher: 'Roblox Corporation',
+    image: '/src/assets/temp-30.jpg',
+    pageName: 'roblox-platform'
+  },
+  {
+    _id: 'minecraft-sandbox',
+    title: 'Minecraft',
+    publisher: 'Mojang Studios',
+    image: '/src/assets/temp-31.jpg',
+    pageName: 'minecraft-sandbox'
+  },
+  {
+    _id: 'cod-mobile',
+    title: 'Call of Duty Mobile',
+    publisher: 'Activision',
+    image: '/src/assets/temp-32.jpg',
+    pageName: 'cod-mobile'
+  }
+];
+
 function AllGames() {
   const [games, setGames] = useState([]);
   const [groupedGames, setGroupedGames] = useState({});
@@ -21,9 +144,16 @@ function AllGames() {
       setLoading(true);
       try {
         const response = await axios.get(`${API_BASE_URL}/games`);
-        setGames(response.data.data);
+        // Combine API games with static games, prioritizing static games
+        const apiGames = response.data.data || [];
+        const combinedGames = [...staticGames, ...apiGames.filter(apiGame => 
+          !staticGames.some(staticGame => staticGame._id === apiGame._id)
+        )];
+        setGames(combinedGames);
       } catch (err) {
-        setError('Failed to fetch games');
+        // If API fails, use only static games
+        setGames(staticGames);
+        setError('Using offline game library');
       } finally {
         setLoading(false);
       }
@@ -53,18 +183,16 @@ function AllGames() {
       let curr = letters[0] || '';
       for (let l of letters) {
         const el = sectionRefs.current[l];
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 100) {
-            curr = l;
-          } else {
-            break;
-          }
+        if (el && el.getBoundingClientRect().top <= 100) {
+          curr = l;
+        } else {
+          break;
         }
       }
       setCurrentLetter(curr);
       setShowTopBtn(window.scrollY > 300);
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [letters]);
@@ -83,32 +211,13 @@ function AllGames() {
   return (
     <>
       <Helmet>
-        <title>All Games - Game Zone</title>
-        <meta name="description" content="Explore all games in Game Zone, sorted alphabetically from A to Z. Find your favorite games by title." />
-        <meta name="keywords" content="games, game zone, all games, alphabetic order" />
-        <meta property="og:title" content="All Games - Game Zone" />
-        <meta property="og:description" content="Browse our collection of games sorted alphabetically with vibrant and interactive cards." />
+        <title>All Products - ClutchCoins</title>
+        <meta name="description" content="Explore all gaming products in ClutchCoins, sorted alphabetically from A to Z. Find your favorite games by title." />
+        <meta name="keywords" content="games, gaming products, clutchcoins, all products, alphabetic order" />
+        <meta property="og:title" content="All Products - ClutchCoins" />
+        <meta property="og:description" content="Browse our collection of gaming products sorted alphabetically with vibrant and interactive cards." />
         <meta property="og:type" content="website" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            "itemListElement": games.map((game, index) => ({
-              "@type": "ListItem",
-              "position": index + 1,
-              "item": {
-                "@type": "Game",
-                "name": game.title,
-                "image": game.image || '',
-                "publisher": {
-                  "@type": "Organization",
-                  "name": game.publisher || ''
-                }
-              }
-            }))
-          })}
-        </script>
       </Helmet>
       <div className="min-h-screen bg-gray-900 text-white">
         <main className="container mx-auto p-4 sm:p-6 md:p-8">
@@ -121,18 +230,18 @@ function AllGames() {
             <div className="mb-6">
               <input
                 type="text"
-                placeholder="Search by game title..."
+                placeholder="Search by product title..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm sm:text-base"
-                aria-label="Search games"
+                aria-label="Search products"
               />
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold mb-8 text-center pt-10 text-white">
-              All Games 
+              All Products 
             </h1>
             {error && (
-              <div className="bg-red-500 text-white p-3 mb-4 rounded-lg text-center" role="alert">
+              <div className="bg-orange-500 text-white p-3 mb-4 rounded-lg text-center" role="alert">
                 {error}
               </div>
             )}
@@ -146,7 +255,7 @@ function AllGames() {
                       key={letter}
                       id={`letter-${letter}`}
                       ref={(el) => (sectionRefs.current[letter] = el)}
-                      clasName="mb-8"
+                      className="mb-8"
                     >
                       <h2 className="text-2xl font-semibold mb-4 sticky top-0 bg-gray-900 py-2 z-10 text-start text-cyan-400 ">
                         {letter}
@@ -155,7 +264,7 @@ function AllGames() {
                         {groupedGames[letter].map((game) => (
                           <motion.article
                             key={game._id}
-                            onClick={() => navigate(`/games/${game._id}`)}
+                            onClick={() => navigate(`/game/${game._id}`)}
                             whileHover={{ scale: 1.05, boxShadow: '0 10px 20px rgba(0, 255, 255, 0.3)' }}
                             transition={{ duration: 0.3 }}
                             className="min-w-[160px] sm:min-w-[160px]  bg-indigo-950/60 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/10 overflow-hidden group relative"
@@ -166,7 +275,7 @@ function AllGames() {
                                 <img
                                   src={game.image}
                                   alt={`${game.title} - Game Cover`}
-                                  className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                                  className="w-full h-full object-contain bg-gray-800 transition-transform duration-500 ease-in-out group-hover:scale-110"
                                   loading="lazy"
                                 />
                               )}

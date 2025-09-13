@@ -25,7 +25,6 @@ const GameDetails = () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/games/${id}`);
         if (response.data.success) {
-          console.log('Game data:', response.data.data); // Debug: Log game data
           setGame(response.data.data);
         } else {
           setError('Failed to fetch game details');
@@ -272,14 +271,6 @@ const GameDetails = () => {
                   className="w-full py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-lg text-xs"
                 >
                   Buy Now
-                </motion.button>
-                <motion.button
-                  onClick={handleBuyWithPaypal}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full py-1.5 bg-blue-700 text-white font-semibold rounded-lg flex items-center justify-center gap-1 text-xs"
-                >
-                  <FaPaypal className="text-sm" /> Buy with PayPal
                 </motion.button>
                 <motion.button
                   onClick={handleSaveForFuture}

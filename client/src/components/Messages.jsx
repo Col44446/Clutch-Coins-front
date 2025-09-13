@@ -69,18 +69,23 @@ const Messages = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && socketRef.current) {
-            const messageId = entry.target.dataset.messageId;
-            socketRef.current.emit("readMessage", { messageId });
+          if (entry.isIntersecting) {
+            const messageId = entry.target.getAttribute('data-message-id');
+            if (messageId) {
+              socketRef.current.emit("readMessage", { messageId });
+            }
           }
         });
       },
       { threshold: 0.5 }
     );
 
-    const messageElements = document.querySelectorAll(".message-article");
-    messageElements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    const messageElements = document.querySelectorAll('[data-message-id]');
+    messageElements.forEach(el => observer.observe(el));
+
+    return () => {
+      observer.disconnect();
+    };
   }, [messages]);
 
   useEffect(() => {
@@ -93,16 +98,23 @@ const Messages = () => {
         setShowEmojiPicker(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
+
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
   useEffect(() => {
-    if (errorMessage) setTimeout(() => setErrorMessage(""), 3000);
+    let timeoutId;
+    if (errorMessage) {
+      timeoutId = setTimeout(() => setErrorMessage(""), 3000);
+    }
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [errorMessage]);
 
   const handleFileChange = (e) => setFile(e.target.files[0]);
@@ -111,7 +123,6 @@ const Messages = () => {
     try {
       // Check microphone permission
       const permissionStatus = await navigator.permissions.query({ name: "microphone" });
-      console.log("🎙️ Microphone permission status:", permissionStatus.state);
       if (permissionStatus.state === "denied") {
         setErrorMessage("Microphone access denied. Please allow in browser settings.");
         return;
@@ -122,14 +133,12 @@ const Messages = () => {
       if (!MediaRecorder.isTypeSupported("audio/webm")) {
         mimeType = MediaRecorder.isTypeSupported("audio/mp3") ? "audio/mp3" : "audio/ogg";
       }
-      console.log("🎙️ Starting recording with MIME type:", mimeType);
 
       const recorder = new MediaRecorder(stream, { mimeType });
       audioChunksRef.current = [];
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) {
           audioChunksRef.current.push(e.data);
-          console.log("🎙️ Audio chunk received:", e.data.size);
         }
       };
       recorder.onstop = () => {
@@ -137,18 +146,15 @@ const Messages = () => {
         const fileName = `voice_message_${Date.now()}.${mimeType.split("/")[1]}`;
         const audioFile = new File([audioBlob], fileName, { type: mimeType });
         setFile(audioFile);
-        console.log("🎙️ Audio file created:", { name: fileName, type: mimeType, size: audioFile.size });
         stream.getTracks().forEach((track) => track.stop());
       };
       recorder.onerror = (err) => {
-        console.error("❌ Recorder error:", err);
         setErrorMessage("Recording failed. Try again or check device.");
       };
       recorder.start();
       setMediaRecorder(recorder);
       setIsRecording(true);
     } catch (err) {
-      console.error("❌ Recording error:", err.name, err.message);
       if (err.name === "NotFoundError") {
         setErrorMessage("No microphone found. Please connect a microphone.");
       } else if (err.name === "NotAllowedError") {
@@ -192,24 +198,22 @@ const Messages = () => {
     if (file) {
       if (!file.type.match(/^(image\/.*|video\/mp4|application\/pdf|audio\/(mp3|webm|ogg))$/)) {
         setErrorMessage(`Unsupported file type: ${file.type || "missing type"}`);
-        console.log("❌ File validation failed:", { name: file.name, type: file.type });
         return;
       }
       if (file.size > 10 * 1024 * 1024) {
-        setErrorMessage("File size exceeds 10MB.");
+        setErrorMessage("File too large (max 10MB)");
         return;
       }
 
-      const formData = new FormData();
-      formData.append("file", file);
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", file);
       try {
         const res = await fetch(`${API_BASE_URL}/upload`, {
           method: "POST",
-          body: formData,
+          body: uploadFormData,
         });
         if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
         const data = await res.json();
-        console.log("📤 Upload response:", data);
         if (data.error || !data.file?.url || !data.file.mimeType) throw new Error(data.error || "Invalid response");
         fileData = {
           url: data.file.url,

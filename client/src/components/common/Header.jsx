@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, AlertCircle, MessageCircle, Search, User, UserPlus } from "lucide-react";
+import { LogOut, AlertCircle, MessageCircle, Search, User, UserPlus, ShoppingCart } from "lucide-react";
 import Signup from "../LogSign";
 import Login from "../Login";
 import Messages from "../Messages";
@@ -9,11 +9,36 @@ import Messages from "../Messages";
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [language, setLanguage] = useState("EN");
+  const [headerHeight, setHeaderHeight] = useState(0);
   const [modalType, setModalType] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
   const [showLogoutWarning, setShowLogoutWarning] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const navigate = useNavigate();
+
+  // Game data for search functionality
+  const gameData = [
+    { id: 'warrior-quest', title: 'Warrior Quest', pageName: 'warrior-quest' },
+    { id: 'elite-shooter', title: 'Elite Shooter', pageName: 'elite-shooter' },
+    { id: 'battlegrounds-mobile', title: 'Battlegrounds Mobile India', pageName: 'battlegrounds-mobile' },
+    { id: 'valorant-tactical', title: 'Valorant', pageName: 'valorant-tactical' },
+    { id: 'roblox-platform', title: 'Roblox', pageName: 'roblox-platform' },
+    { id: 'minecraft-sandbox', title: 'Minecraft', pageName: 'minecraft-sandbox' },
+    { id: 'cod-mobile', title: 'Call of Duty Mobile', pageName: 'cod-mobile' },
+    { id: 'speed-racing', title: 'Speed Racing', pageName: 'speed-racing' },
+    { id: 'adventure-world', title: 'Adventure World', pageName: 'adventure-world' },
+    { id: 'puzzle-master', title: 'Puzzle Master', pageName: 'puzzle-master' },
+    { id: 'strategy-empire', title: 'Strategy Empire', pageName: 'strategy-empire' },
+    { id: 'fantasy-rpg', title: 'Fantasy RPG', pageName: 'fantasy-rpg' },
+    { id: 'sports-champions', title: 'Sports Champions', pageName: 'sports-champions' },
+    { id: 'action-hero', title: 'Action Hero', pageName: 'action-hero' },
+    { id: 'life-simulator', title: 'Life Simulator', pageName: 'life-simulator' },
+    { id: 'horror-nights', title: 'Horror Nights', pageName: 'horror-nights' },
+    { id: 'survival-island', title: 'Survival Island', pageName: 'survival-island' }
+  ];
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const switchLanguage = (e) => setLanguage(e.target.value);
@@ -47,7 +72,7 @@ function Header() {
       setIsOpen(false);
       navigate("/");
     } catch (error) {
-      console.error("❌ Logout failed:", error);
+      console.error("⌐ Logout failed:", error);
     }
   };
 
@@ -61,6 +86,35 @@ function Header() {
     }
   };
 
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    
+    if (query.length > 0) {
+      const filteredGames = gameData.filter(game => 
+        game.pageName.toLowerCase().includes(query.toLowerCase()) || 
+        game.title.toLowerCase().includes(query.toLowerCase())
+      );
+      setSearchResults(filteredGames.slice(0, 5)); // Show max 5 results
+      setShowSearchDropdown(true);
+    } else {
+      setSearchResults([]);
+      setShowSearchDropdown(false);
+    }
+  };
+
+  const handleSearchResultClick = (game) => {
+    navigate(`/game/${game.pageName}`);
+    setSearchQuery("");
+    setShowSearchDropdown(false);
+    setSearchResults([]);
+  };
+
+  const handleSearchBlur = () => {
+    // Delay hiding dropdown to allow clicks
+    setTimeout(() => setShowSearchDropdown(false), 200);
+  };
+
   const role = localStorage.getItem("role");
   let navItems = [
     { to: "/games", label: "Games" },
@@ -71,7 +125,6 @@ function Header() {
     const dashboardPath = role === "admin" ? "/admin-dashboard" : "/user-dashboard";
     navItems.push({ to: dashboardPath, label: "Dashboard" });
   }
-  navItems.push({ to: "/more", label: "More" });
 
   const menuVariants = {
     closed: { opacity: 0, y: -100 },
@@ -104,27 +157,105 @@ function Header() {
     pulse: { scale: [1, 1.05, 1], transition: { duration: 1.5, repeat: Infinity } },
   };
 
+  const logoVariants = {
+    initial: { scale: 1 },
+    hover: { scale: 1.05, transition: { duration: 0.2 } },
+  };
+
+  const cartButtonVariants = {
+    initial: { scale: 1 },
+    hover: { scale: 1.05, transition: { duration: 0.2 } },
+  };
+
+  const [cartItemCount, setCartItemCount] = useState(0);
+
+  useEffect(() => {
+    fetchCartCount();
+  }, [isAuthenticated]);
+
+  const fetchCartCount = async () => {
+    if (!isAuthenticated) {
+      setCartItemCount(0);
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setCartItemCount(0);
+        return;
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/cart`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          const totalItems = data.data.items.reduce((total, item) => total + item.quantity, 0);
+          setCartItemCount(totalItems);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching cart count:', error);
+      setCartItemCount(0);
+    }
+  };
+
+  // Listen for cart updates from other components
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      fetchCartCount();
+    };
+
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    return () => window.removeEventListener('cartUpdated', handleCartUpdate);
+  }, [isAuthenticated]);
+
   return (
     <>
       <nav className="bg-gradient-to-b from-blue-900 via-blue-950 to-slate-950 p-3 fixed w-full top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <div className="flex flex-col items-start">
-              <Link
-                to="/"
-                className="text-2xl sm:text-3xl font-bold text-white hover:text-cyan-300 transition-colors duration-200"
-              >
-                Clutch <span className="text-cyan-500">Coins</span>
-              </Link>
+            <div className="flex items-center gap-3">
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="text-left text-white text-xs sm:text-sm font-semibold tracking-wider select-none"
+                variants={logoVariants}
+                initial="initial"
+                whileHover="hover"
+                className="flex-shrink-0"
               >
-                INSTANT RECHARGE. INSTANT VICTORY!
+                <Link to="/" className="block">
+                  <img 
+                    src="/src/assets/clutch-coins-logo.svg" 
+                    alt="Clutch Coins Logo" 
+                    className="w-12 h-12 sm:w-14 sm:h-14 object-contain filter brightness-110"
+                  />
+                </Link>
               </motion.div>
+              
+              {/* Brand Text */}
+              <div className="flex flex-col items-start">
+                <Link
+                  to="/"
+                  className="text-2xl sm:text-3xl font-bold text-white hover:text-cyan-300 transition-colors duration-200"
+                >
+                  Clutch <span className="text-cyan-500">Coins</span>
+                </Link>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-left text-white text-xs sm:text-sm font-semibold tracking-wider select-none"
+                >
+                  INSTANT RECHARGE. INSTANT VICTORY!
+                </motion.div>
+              </div>
             </div>
+            
             <div className="flex items-center gap-3">
               <motion.button
                 onClick={handleChatClick}
@@ -156,6 +287,7 @@ function Header() {
               </motion.button>
             </div>
           </div>
+          
           <AnimatePresence>
             {isOpen && (
               <motion.div
@@ -189,13 +321,30 @@ function Header() {
                   transition={{ delay: 0.4 }}
                   className="mt-4 flex flex-col gap-3"
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="relative flex items-center gap-2">
                     <Search className="w-5 h-5 text-white" />
                     <input
                       type="text"
-                      placeholder="Search..."
+                      value={searchQuery}
+                      placeholder="Search games..."
                       className="bg-gray-800 text-white rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 w-full"
+                      onChange={handleSearch}
+                      onBlur={handleSearchBlur}
                     />
+                    {showSearchDropdown && searchResults.length > 0 && (
+                      <div className="absolute top-full left-6 mt-1 w-64 bg-gray-800 border border-gray-600 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+                        {searchResults.map((game) => (
+                          <div
+                            key={game.id}
+                            className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-white text-sm border-b border-gray-600 last:border-b-0"
+                            onClick={() => handleSearchResultClick(game)}
+                          >
+                            <div className="font-medium">{game.title}</div>
+                            <div className="text-xs text-gray-400">{game.pageName}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <select
                     value={language}
@@ -206,15 +355,29 @@ function Header() {
                     <option value="HI">HI</option>
                   </select>
                   {isAuthenticated ? (
-                    <motion.button
-                      onClick={handleLogout}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="flex items-center gap-2 text-white text-sm font-medium hover:text-cyan-300"
-                    >
-                      <LogOut className="w-5 h-5" />
-                      Logout
-                    </motion.button>
+                    <div className="flex flex-col gap-2">
+                      <motion.button
+                        onClick={() => {
+                          navigate('/account');
+                          setIsOpen(false);
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center gap-2 text-white text-sm font-medium hover:text-cyan-300"
+                      >
+                        <User className="w-5 h-5" />
+                        My Account
+                      </motion.button>
+                      <motion.button
+                        onClick={handleLogout}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center gap-2 text-white text-sm font-medium hover:text-cyan-300"
+                      >
+                        <LogOut className="w-5 h-5" />
+                        Logout
+                      </motion.button>
+                    </div>
                   ) : (
                     <div className="flex gap-3">
                       <motion.button
@@ -241,6 +404,7 @@ function Header() {
               </motion.div>
             )}
           </AnimatePresence>
+          
           <div className="hidden md:flex items-center justify-between mt-2">
             <div className="flex items-center space-x-4">
               {navItems.map((item, index) => (
@@ -261,13 +425,30 @@ function Header() {
               ))}
             </div>
             <div className="flex items-center space-x-3">
-              <div className="flex items-center gap-2">
+              <div className="relative flex items-center gap-2">
                 <Search className="w-5 h-5 text-white" />
                 <input
                   type="text"
-                  placeholder="Search..."
+                  value={searchQuery}
+                  placeholder="Search games..."
                   className="bg-gray-800 text-white rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  onChange={handleSearch}
+                  onBlur={handleSearchBlur}
                 />
+                {showSearchDropdown && searchResults.length > 0 && (
+                  <div className="absolute top-full left-6 mt-1 w-64 bg-gray-800 border border-gray-600 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+                    {searchResults.map((game) => (
+                      <div
+                        key={game.id}
+                        className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-white text-sm border-b border-gray-600 last:border-b-0"
+                        onClick={() => handleSearchResultClick(game)}
+                      >
+                        <div className="font-medium">{game.title}</div>
+                        <div className="text-xs text-gray-400">{game.pageName}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <select
                 value={language}
@@ -278,15 +459,37 @@ function Header() {
                 <option value="HI">HI</option>
               </select>
               {isAuthenticated ? (
-                <motion.button
-                  onClick={handleLogout}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 text-white text-sm font-medium hover:text-cyan-300"
-                >
-                  <LogOut className="w-5 h-5" />
-                  Logout
-                </motion.button>
+                <div className="flex items-center gap-3">
+                  <motion.button
+                    onClick={() => navigate('/account')}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center justify-center bg-gray-800 text-white rounded-full p-2 hover:bg-cyan-600 transition-colors duration-200"
+                    aria-label="Account"
+                  >
+                    <User className="w-5 h-5" />
+                  </motion.button>
+                  <motion.button
+                    onClick={() => navigate('/cart')}
+                    whileHover={cartButtonVariants.hover}
+                    className="flex items-center justify-center bg-gray-800 text-white rounded-full p-2 hover:bg-cyan-600 transition-colors duration-200 relative"
+                    aria-label="Cart"
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    {cartItemCount > 0 && (
+                      <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">{cartItemCount}</span>
+                    )}
+                  </motion.button>
+                  <motion.button
+                    onClick={handleLogout}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-2 text-white text-sm font-medium hover:text-cyan-300"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    Logout
+                  </motion.button>
+                </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <motion.button
@@ -365,7 +568,7 @@ function Header() {
               {modalType === "signup" && <Signup onClose={closeModal} onSwitch={openLogin} />}
               {modalType === "login" && (
                 <Login
-                  on Close={closeModal}
+                  onClose={closeModal}
                   onSwitch={openSignup}
                   onLogin={() => {
                     setIsAuthenticated(true);

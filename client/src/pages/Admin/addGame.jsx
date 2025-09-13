@@ -138,14 +138,12 @@ function AddGame({ isEdit = false }) {
     }
 
     for (const [key, value] of formData.entries()) {
-      console.log(`FormData ${key}:`, value);
+      // FormData validation could be added here if needed
     }
 
     try {
       const url = isEdit ? `${API_BASE_URL}/games/${id}` : `${API_BASE_URL}/games`;
       const method = isEdit ? 'put' : 'post';
-      console.log(`Sending ${method.toUpperCase()} request to: ${url}`);
-      console.log('Token:', token);
 
       const response = await axios({
         method,
@@ -166,9 +164,6 @@ function AddGame({ isEdit = false }) {
       }
     } catch (err) {
       console.error('API error:', err);
-      console.log('Error response:', err.response);
-      console.log('Error message:', err.message);
-      console.log('Error code:', err.code);
       setError(
         err.response?.data?.message ||
         err.message ||

@@ -48,8 +48,6 @@ function CreateBlogWithSidebar() {
         },
       });
 
-      console.log('✅ Blog Created:', response.data);
-
       if (response.data.success) {
         setSuccess(true);
         setTimeout(() => navigate('/admin/blogs'), 2000);

@@ -21,7 +21,7 @@
     "framer-motion": "^12.23.12",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.539.0",
+    "lucide-react": "^0.544.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-helmet": "^6.1.0",

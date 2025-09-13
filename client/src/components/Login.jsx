@@ -21,7 +21,6 @@ const Login = ({ onClose, onSwitch, onLogin }) => {
       : "http://localhost:5000/api/users/login"; // directly backend URL
 
     try {
-      console.log("Sending login request to:", url, "with email:", email);
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -29,7 +28,6 @@ const Login = ({ onClose, onSwitch, onLogin }) => {
       });
 
       const data = await res.json();
-      console.log("API response:", data);
 
       if (data.success && data.user) {
         // Ensure user object exists
@@ -51,9 +49,12 @@ const Login = ({ onClose, onSwitch, onLogin }) => {
         setMsg("❌ " + (data.message || "Invalid credentials"));
       }
     } catch (error) {
-      console.error("Server error:", error);
       setMsg("❌ Server error");
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/users/auth/google`;
   };
 
   const popupVariants = {
@@ -146,6 +147,15 @@ const Login = ({ onClose, onSwitch, onLogin }) => {
               <KeyRound className="w-5 h-5" /> Login
             </button>
           </form>
+
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="w-full bg-red-600 hover:bg-red-500 p-2 rounded font-semibold flex items-center justify-center gap-2 mt-2"
+          >
+            <img src="https://img.icons8.com/color/48/000000/google-logo.png" className="w-5 h-5" />
+            Login with Google
+          </button>
 
           <div className="mt-3 text-center text-sm">
             <p>

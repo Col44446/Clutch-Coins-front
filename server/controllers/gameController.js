@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const Game = require("../models/Game");
+const Purchase = require("../models/Purchase");
 
 // Add Game
 exports.addGame = async (req, res) => {
@@ -150,6 +151,53 @@ exports.getGameById = async (req, res) => {
     res.json({ success: true, data: game });
   } catch (error) {
     console.error("Get Game By ID Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Get Game by Page Name
+exports.getGameByPageName = async (req, res) => {
+  try {
+    const { pageName } = req.params;
+    const game = await Game.findOne({ pageName });
+
+    if (!game) {
+      return res.status(404).json({ success: false, message: "Game not found" });
+    }
+
+    res.json({ success: true, data: game });
+  } catch (error) {
+    console.error("Get Game By Page Name Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Create Purchase
+exports.createPurchase = async (req, res) => {
+  try {
+    const { gameId, currencyName, amount, gameUserId } = req.body;
+    const userId = req.user.id; // Assuming user is authenticated
+
+    const game = await Game.findById(gameId);
+    if (!game) {
+      return res.status(404).json({ success: false, message: "Game not found" });
+    }
+
+    const purchase = new Purchase({
+      userId,
+      gameId,
+      gameName: game.title,
+      gamePageName: game.pageName,
+      currencyName,
+      amount,
+      gameUserId,
+      status: 'completed'
+    });
+
+    await purchase.save();
+    res.status(201).json({ success: true, data: purchase });
+  } catch (error) {
+    console.error("Create Purchase Error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
