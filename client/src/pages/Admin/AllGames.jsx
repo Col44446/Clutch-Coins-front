@@ -9,7 +9,7 @@ function AllGames() {
   const token = localStorage.getItem("token");
   if (!token) return <Navigate to="/login" replace />;
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Collapsed by default on mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
   const [games, setGames] = useState([]);
   const [filteredGames, setFilteredGames] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');

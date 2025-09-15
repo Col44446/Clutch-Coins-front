@@ -7,9 +7,9 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 import SEOHead from './components/common/SEOHead';
 import CustomScrollbar from "./components/common/CustomScrollbar";
 import './App.css';
-
+import { Home } from './pages/Home';
 // Main Pages
-import Home from './pages/Home';
+
 import AccountPage from './pages/Account/AccountPage';
 import CartPage from './pages/Cart/CartPage';
 import AdminDashboard from './pages/Admin/AdminDashboard';
@@ -28,7 +28,6 @@ import PurchaseSuccess from "./pages/Purchase/PurchaseSuccess";
 // Components
 import BlogsList from "./components/BlogList";
 import GameDetails from "./components/GameSection/GameDetails";
-import StaticGameDetails from "./components/GameSection/StaticGameDetails";
 import Login from "./components/Login";
 import Signup from "./components/LogSign";
 import OTPVerify from "./components/OTPVerify";
@@ -45,6 +44,7 @@ import FAQ from './pages/FAQ';
 import HowToUse from './pages/HowToUse';
 import DeliveryInfo from './pages/DeliveryInfo';
 import NotFound from './pages/NotFound';
+import AuthCallback from './pages/AuthCallback';
 
 function App() {
   return (
@@ -57,12 +57,13 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/otp-verify" element={<OTPVerify />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/blogs" element={<BlogsList />} />
         <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/games" element={<AllGame />} />
-        <Route path="/game/:id" element={<StaticGameDetails />} />
+        <Route path="/games/:id" element={<GameDetails />} />
         
         {/* Purchase Routes */}
         <Route path="/payment" element={<PaymentGateway />} />

@@ -1,5 +1,6 @@
 const express = require("express");
 const passport = require("passport");
+const jwt = require("jsonwebtoken"); // Added jsonwebtoken
 const router = express.Router();
 const { signupRequest, verifyOTP, login } = require("../controllers/userControler");
 const { logout } = require("../controllers/logoutController");
@@ -26,8 +27,24 @@ router.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-    const token = jwt.sign({ role: "user", email: req.user.email }, "supersecretkey", { expiresIn: "1h" });
-    res.redirect(`http://localhost:5173?token=${token}`); // frontend pe redirect, adjust url
+    try {
+      const token = jwt.sign(
+        { 
+          userId: req.user._id,
+          role: req.user.role || "user", 
+          email: req.user.email 
+        }, 
+        process.env.JWT_SECRET || "supersecretkey", 
+        { expiresIn: "7d" }
+      );
+      
+      // Redirect to frontend with token
+      const frontendURL = process.env.FRONTEND_URL || "http://localhost:5173";
+      res.redirect(`${frontendURL}/auth/callback?token=${token}`);
+    } catch (error) {
+      console.error("Google auth callback error:", error);
+      res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}?error=auth_failed`);
+    }
   }
 );
 

@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const passport = require("passport");
+const session = require("express-session"); // Added express-session
 
 const http = require("http");
 const { Server } = require("socket.io");
@@ -41,7 +42,19 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "Uploads")));
+
+// ✅ Add express-session middleware before passport
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "supersecretkey",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === "production" } // Secure cookies in production
+  })
+);
+
 app.use(passport.initialize());
+app.use(passport.session()); // Add passport.session() for session support
 
 // Routes
 app.use("/api/admin", adminRoutes);

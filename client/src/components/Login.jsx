@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, X, Mail, Lock, LogIn, KeyRound, CheckCircle2 } from "lucide-react";
 import { Helmet } from "react-helmet";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
 
 const Login = ({ onClose, onSwitch, onLogin }) => {
   const [email, setEmail] = useState("");
@@ -11,14 +12,15 @@ const Login = ({ onClose, onSwitch, onLogin }) => {
   const [msg, setMsg] = useState("");
   const [successPopup, setSuccessPopup] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const isAdmin = email.toLowerCase().includes("admin");
     const url = isAdmin
-      ? "http://localhost:5000/api/admin/login"
-      : "http://localhost:5000/api/users/login"; // directly backend URL
+      ? `${import.meta.env.VITE_API_BASE_URL}/admin/login`
+      : `${import.meta.env.VITE_API_BASE_URL}/users/login`;
 
     try {
       const res = await fetch(url, {
@@ -30,14 +32,12 @@ const Login = ({ onClose, onSwitch, onLogin }) => {
       const data = await res.json();
 
       if (data.success && data.user) {
-        // Ensure user object exists
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", isAdmin ? "admin" : "user");
-        localStorage.setItem("userId", data.user._id); 
-        localStorage.setItem("userName", data.user.name); 
+        localStorage.setItem("userId", data.user._id);
+        localStorage.setItem("userName", data.user.name);
         setSuccessPopup(true);
         setMsg("");
-
         setTimeout(() => {
           setSuccessPopup(false);
           if (typeof onLogin === "function") onLogin();
@@ -54,7 +54,7 @@ const Login = ({ onClose, onSwitch, onLogin }) => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/users/auth/google`;
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/users/auth/google`;
   };
 
   const popupVariants = {
@@ -150,16 +150,20 @@ const Login = ({ onClose, onSwitch, onLogin }) => {
             <button className="w-full bg-cyan-600 hover:bg-cyan-500 p-2 rounded font-semibold flex items-center justify-center gap-2">
               <KeyRound className="w-5 h-5" /> Login
             </button>
-          </form>
 
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            className="w-full bg-red-600 hover:bg-red-500 p-2 rounded font-semibold flex items-center justify-center gap-2 mt-2"
-          >
-            <img src="https://img.icons8.com/color/48/000000/google-logo.png" className="w-5 h-5" />
-            Login with Google
-          </button>
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full mt-3 bg-white text-gray-800 hover:bg-gray-100 p-2 rounded flex items-center justify-center gap-2"
+            >
+              <img
+                src="https://www.svgrepo.com/show/355037/google.svg"
+                alt="google"
+                className="w-5 h-5"
+              />
+              Continue with Google
+            </button>
+          </form>
 
           <div className="mt-3 text-center text-sm">
             <p>

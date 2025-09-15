@@ -17,20 +17,33 @@ passport.use(
             googleId: profile.id,
             name: profile.displayName,
             email: profile.emails[0].value,
-            // dob optional, pass nahi
+            dob: null, // Explicitly null to avoid any issues
           });
           await user.save();
+          console.log("New user created:", user); // Debug log
         }
+        console.log("User for serialization:", user); // Debug log
         done(null, user);
       } catch (err) {
+        console.error("Error in Google strategy:", err); // Debug log
         done(err, null);
       }
     }
   )
 );
 
-passport.serializeUser((user, done) => done(null, user.id));
+passport.serializeUser((user, done) => {
+  console.log("Serializing user with ID:", user._id); // Use _id instead of id
+  done(null, user._id); // Fix: Changed from user.id to user._id
+});
+
 passport.deserializeUser(async (id, done) => {
-  const user = await User.findById(id);
-  done(null, user);
+  try {
+    const user = await User.findById(id);
+    console.log("Deserialized user:", user); // Debug log
+    done(null, user);
+  } catch (err) {
+    console.error("Error in deserializeUser:", err); // Debug log
+    done(err, null);
+  }
 });

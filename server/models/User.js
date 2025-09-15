@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  dob: { type: Date, required: true },
+  dob: { type: Date, required: false },
   password: { type: String }, // hashed, google ke liye optional
   googleId: { type: String, unique: true, sparse: true },
   role: { type: String, default: "user" },

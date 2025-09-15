@@ -63,9 +63,9 @@ function MainCard() {
   }, []);
 
   return (
-    <section className="flex flex-col justify-center items-center min-h-screen bg-gray-900 text-white px-2 sm:px-4 md:px-6 lg:px-8">
+    <section className="flex flex-col justify-center mt-30 items-center bg-gray-900 text-white px-4 py-8">
       {/* Carousel container */}
-      <div className="mt-16 sm:mt-20 md:mt-24 lg:mt-32 xl:mt-40 relative w-full max-w-7xl h-48 sm:h-64 md:h-80 lg:h-96 overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl lg:rounded-3xl">
+      <div className="relative w-full max-w-4xl h-64 sm:h-80 md:h-96 overflow-hidden rounded-xl shadow-2xl">
         {/* Navigation Arrows */}
         <button
           onClick={prevSlide}
@@ -101,20 +101,19 @@ function MainCard() {
               src={img.src}
               alt={img.alt}
               onClick={() => handleImageClick(img.gameId)}
-              className={`absolute top-0 left-0 w-full h-full object-cover rounded-lg sm:rounded-xl md:rounded-2xl lg:rounded-3xl shadow-lg sm:shadow-xl md:shadow-2xl border border-white/30 transform transition-all duration-500 ease-in-out cursor-pointer hover:scale-105 ${position}`}
-              style={{ aspectRatio: '9/16' }}
+              className={`absolute top-0 left-0 w-full h-full object-cover rounded-xl shadow-2xl border border-white/20 transform transition-all duration-500 ease-in-out cursor-pointer hover:scale-105 ${position}`}
             />
           );
         })}
       </div>
 
       {/* Indicator Dots */}
-      <div className="flex space-x-2 mt-4 sm:mt-6">
+      <div className="flex space-x-2 mt-6">
         {images.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`h-1 rounded-full transition-all duration-300 hover:bg-sky-300 ${index === currentIndex ? 'bg-sky-400 w-4 sm:w-6 md:w-8' : 'bg-gray-500 w-2 sm:w-3 md:w-4'
+            className={`h-2 rounded-full transition-all duration-300 hover:bg-sky-300 ${index === currentIndex ? 'bg-sky-400 w-8' : 'bg-gray-500 w-2'
               }`}
             aria-label={`Go to slide ${index + 1}`}
           ></button>

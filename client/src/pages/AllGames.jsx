@@ -2,131 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
-import SEOHead from '../components/common/SEOHead';
 import axios from 'axios';
-
-// Static games data matching homepage dummy games
-const staticGames = [
-  {
-    _id: 'speed-racing',
-    title: 'Speed Racing',
-    publisher: 'Velocity Studios',
-    image: '/src/assets/temp-11.jpg',
-    pageName: 'speed-racing'
-  },
-  {
-    _id: 'adventure-world',
-    title: 'Adventure World',
-    publisher: 'Quest Games',
-    image: '/src/assets/temp-12.jpg',
-    pageName: 'adventure-world'
-  },
-  {
-    _id: 'puzzle-master',
-    title: 'Puzzle Master',
-    publisher: 'Brain Games Inc',
-    image: '/src/assets/temp-13.jpg',
-    pageName: 'puzzle-master'
-  },
-  {
-    _id: 'strategy-empire',
-    title: 'Strategy Empire',
-    publisher: 'Empire Studios',
-    image: '/src/assets/temp-14.jpg',
-    pageName: 'strategy-empire'
-  },
-  {
-    _id: 'fantasy-rpg',
-    title: 'Fantasy RPG',
-    publisher: 'Mythic Games',
-    image: '/src/assets/temp-15.jpg',
-    pageName: 'fantasy-rpg'
-  },
-  {
-    _id: 'sports-champions',
-    title: 'Sports Champions',
-    publisher: 'Athletic Games',
-    image: '/src/assets/temp-16.jpg',
-    pageName: 'sports-champions'
-  },
-  {
-    _id: 'action-hero',
-    title: 'Action Hero',
-    publisher: 'Hero Studios',
-    image: '/src/assets/temp-17.jpg',
-    pageName: 'action-hero'
-  },
-  {
-    _id: 'warrior-quest',
-    title: 'Warrior Quest',
-    publisher: 'Epic Games Studio',
-    image: '/src/assets/temp-18.png',
-    pageName: 'warrior-quest'
-  },
-  {
-    _id: 'elite-shooter',
-    title: 'Elite Shooter',
-    publisher: 'Combat Studios',
-    image: '/src/assets/temp-19.png',
-    pageName: 'elite-shooter'
-  },
-  {
-    _id: 'life-simulator',
-    title: 'Life Simulator',
-    publisher: 'Reality Games',
-    image: '/src/assets/temp-20.png',
-    pageName: 'life-simulator'
-  },
-  {
-    _id: 'horror-nights',
-    title: 'Horror Nights',
-    publisher: 'Nightmare Studios',
-    image: '/src/assets/temp-21.png',
-    pageName: 'horror-nights'
-  },
-  {
-    _id: 'survival-island',
-    title: 'Survival Island',
-    publisher: 'Wilderness Games',
-    image: '/src/assets/temp-22.png',
-    pageName: 'survival-island'
-  },
-  {
-    _id: 'battlegrounds-mobile',
-    title: 'Battlegrounds Mobile India',
-    publisher: 'Krafton',
-    image: '/src/assets/temp-28.jpg',
-    pageName: 'battlegrounds-mobile'
-  },
-  {
-    _id: 'valorant-tactical',
-    title: 'Valorant',
-    publisher: 'Riot Games',
-    image: '/src/assets/temp-29.jpg',
-    pageName: 'valorant-tactical'
-  },
-  {
-    _id: 'roblox-platform',
-    title: 'Roblox',
-    publisher: 'Roblox Corporation',
-    image: '/src/assets/temp-30.jpg',
-    pageName: 'roblox-platform'
-  },
-  {
-    _id: 'minecraft-sandbox',
-    title: 'Minecraft',
-    publisher: 'Mojang Studios',
-    image: '/src/assets/temp-31.jpg',
-    pageName: 'minecraft-sandbox'
-  },
-  {
-    _id: 'cod-mobile',
-    title: 'Call of Duty Mobile',
-    publisher: 'Activision',
-    image: '/src/assets/temp-32.jpg',
-    pageName: 'cod-mobile'
-  }
-];
 
 function AllGames() {
   const [games, setGames] = useState([]);
@@ -145,16 +21,9 @@ function AllGames() {
       setLoading(true);
       try {
         const response = await axios.get(`${API_BASE_URL}/games`);
-        // Combine API games with static games, prioritizing static games
-        const apiGames = response.data.data || [];
-        const combinedGames = [...staticGames, ...apiGames.filter(apiGame => 
-          !staticGames.some(staticGame => staticGame._id === apiGame._id)
-        )];
-        setGames(combinedGames);
+        setGames(response.data.data);
       } catch (err) {
-        // If API fails, use only static games
-        setGames(staticGames);
-        setError('Using offline game library');
+        setError('Failed to fetch games');
       } finally {
         setLoading(false);
       }
@@ -184,16 +53,18 @@ function AllGames() {
       let curr = letters[0] || '';
       for (let l of letters) {
         const el = sectionRefs.current[l];
-        if (el && el.getBoundingClientRect().top <= 100) {
-          curr = l;
-        } else {
-          break;
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 80) {
+            curr = l;
+          } else {
+            break;
+          }
         }
       }
       setCurrentLetter(curr);
-      setShowTopBtn(window.scrollY > 300);
+      setShowTopBtn(window.scrollY > 200);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [letters]);
@@ -209,62 +80,64 @@ function AllGames() {
     }
   };
 
-  const gamesStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    "name": "Gaming Products",
-    "description": "Complete collection of gaming recharge and top-up services",
-    "url": "https://clutchcoins.com/games",
-    "numberOfItems": games.length,
-    "mainEntity": {
-      "@type": "ItemList",
-      "itemListElement": games.slice(0, 10).map((game, index) => ({
-        "@type": "Product",
-        "position": index + 1,
-        "name": game.title,
-        "description": `Gaming recharge service for ${game.title}`,
-        "brand": game.publisher
-      }))
-    }
-  };
-
   return (
     <>
-      <SEOHead
-        title="All Games - Gaming Recharge Services | ClutchCoins"
-        description="Browse our complete collection of gaming recharge services for popular games like PUBG, Valorant, Roblox, Minecraft and more. Fast, secure, and reliable top-up services."
-        keywords="all games, gaming recharge, game top-up services, PUBG mobile, Valorant, Roblox, Minecraft, gaming collection"
-        structuredData={gamesStructuredData}
-        type="webpage"
-      />
+      <Helmet>
+        <title>All Games - Game Zone</title>
+        <meta name="description" content="Explore all games in Game Zone, sorted alphabetically. Find your favorite games by title." />
+        <meta name="keywords" content="games, game zone, all games, alphabetic order" />
+        <meta property="og:title" content="All Games - Game Zone" />
+        <meta property="og:description" content="Browse our collection of games sorted alphabetically with compact interactive cards." />
+        <meta property="og:type" content="website" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "itemListElement": games.map((game, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "item": {
+                "@type": "Game",
+                "name": game.title,
+                "image": game.image || '',
+                "publisher": {
+                  "@type": "Organization",
+                  "name": game.publisher || ''
+                }
+              }
+            }))
+          })}
+        </script>
+      </Helmet>
       <div className="min-h-screen bg-gray-900 text-white">
-        <main className="container mx-auto p-4 sm:p-6 md:p-8">
+        <main className=" container mx-auto p-3 sm:p-4 md:p-6">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-6xl mx-auto"
+            transition={{ duration: 0.4 }}
+            className="max-w-5xl mx-auto"
           >
-            <div className="mb-6">
+            <div className="mb-4">
               <input
                 type="text"
-                placeholder="Search by product title..."
+                placeholder="Search games..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm sm:text-base"
-                aria-label="Search products"
+                className="w-full p-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-1 focus:ring-cyan-500 text-xs sm:text-sm"
+                aria-label="Search games"
               />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold mb-8 text-center pt-10 text-white">
-              All Products 
+            <h1 className=" pt-10 text-2xl sm:text-3xl font-bold mb-6 text-center text-white">
+              All Games
             </h1>
             {error && (
-              <div className="bg-orange-500 text-white p-3 mb-4 rounded-lg text-center" role="alert">
+              <div className="bg-red-500 text-white p-2 mb-3 rounded-md text-center text-sm" role="alert">
                 {error}
               </div>
             )}
             {loading ? (
-              <div className="text-center text-lg">Loading...</div>
+              <div className="text-center text-base">Loading...</div>
             ) : (
               <>
                 <div className="relative">
@@ -273,42 +146,42 @@ function AllGames() {
                       key={letter}
                       id={`letter-${letter}`}
                       ref={(el) => (sectionRefs.current[letter] = el)}
-                      className="mb-8"
+                      className="mb-6"
                     >
-                      <h2 className="text-2xl font-semibold mb-4 sticky top-0 bg-gray-900 py-2 z-10 text-start text-cyan-400 ">
+                      <h2 className="text-xl font-semibold mb-3 sticky top-0 bg-gray-900 py-1 z-10 text-cyan-400">
                         {letter}
                       </h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                         {groupedGames[letter].map((game) => (
                           <motion.article
                             key={game._id}
-                            onClick={() => navigate(`/game/${game._id}`)}
-                            whileHover={{ scale: 1.05, boxShadow: '0 10px 20px rgba(0, 255, 255, 0.3)' }}
-                            transition={{ duration: 0.3 }}
-                            className="min-w-[160px] sm:min-w-[160px]  bg-indigo-950/60 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/10 overflow-hidden group relative"
+                            onClick={() => navigate(`/games/${game._id}`)}
+                            whileHover={{ scale: 1.03, boxShadow: '0 6px 12px rgba(0, 255, 255, 0.2)' }}
+                            transition={{ duration: 0.2 }}
+                            className="bg-indigo-950/70 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-white/10 overflow-hidden group relative cursor-pointer"
                           >
-                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/40 via-blue-700/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out z-10"></div>
-                            <div className="relative h-56 sm:h-64">
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+                            <div className="relative h-40 sm:h-48">
                               {game.image && (
                                 <img
                                   src={game.image}
-                                  alt={`${game.title} - Game Cover`}
-                                  className="w-full h-full object-contain bg-gray-800 transition-transform duration-500 ease-in-out group-hover:scale-110"
+                                  alt={`${game.title} cover`}
+                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                   loading="lazy"
                                 />
                               )}
-                              <div className="absolute inset-0 bg-black/80 text-white p-3 text-[11px] sm:text-xs opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 ease-in-out flex items-center justify-center text-center z-20">
+                              <div className="absolute inset-0 bg-black/70 text-white p-2 text-xs opacity-0 group-hover:opacity-100 transform translate-y-3 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center text-center z-20">
                                 <div>
-                                  <h3 className="text-lg font-bold mb-1">{game.title}</h3>
-                                  <p className="text-sm">{game.publisher || 'Unknown Publisher'}</p>
+                                  <h3 className="text-base font-semibold mb-1">{game.title}</h3>
+                                  <p className="text-xs">{game.publisher || 'Unknown'}</p>
                                 </div>
                               </div>
-                              <div className="absolute mb-7 bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 z-30 transition-all duration-500">
-                                <button className="px-4 py-1 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs sm:text-sm font-semibold rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300">
+                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 z-30 transition-all duration-300">
+                                <button className="px-3 py-1 bg-cyan-500 text-white text-xs font-semibold rounded-full shadow hover:shadow-md hover:scale-105 transition-transform duration-200">
                                   Top Up
                                 </button>
                               </div>
-                              <div className="absolute bottom-0 left-0 w-full bg-gradient-to-b from-black/90 to-black/70 text-white text-center py-2 text-xs sm:text-sm font-bold drop-shadow-sm z-20">
+                              <div className="absolute bottom-0 left-0 w-full bg-black/70 text-white text-center py-1 text-xs font-semibold z-20">
                                 {game.title}
                               </div>
                             </div>
@@ -318,13 +191,13 @@ function AllGames() {
                     </div>
                   ))}
                 </div>
-                <aside className="fixed right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 p-2 rounded-lg shadow-lg z-20 max-h-[60vh] overflow-y-auto">
-                  <ul className="space-y-1 text-center">
+                <aside className="fixed right-3 top-1/2 transform -translate-y-1/2 bg-gray-800 p-1 rounded-md shadow-md z-20 max-h-[50vh] overflow-y-auto">
+                  <ul className="space-y-0.5 text-center">
                     {letters.map((letter) => (
                       <li key={letter}>
                         <button
                           onClick={() => scrollToLetter(letter)}
-                          className={`text-lg font-bold ${
+                          className={`text-base font-semibold ${
                             currentLetter === letter ? 'text-cyan-500' : 'text-white'
                           } hover:text-cyan-300 transition-colors`}
                         >
@@ -340,9 +213,9 @@ function AllGames() {
           {showTopBtn && (
             <motion.button
               onClick={scrollToTop}
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="fixed bottom-8 right-8 bg-cyan-500 text-white p-3 rounded-full shadow-lg hover:bg-cyan-600 transition-all"
+              className="fixed bottom-6 right-6 bg-cyan-500 text-white p-2 rounded-full shadow-md hover:bg-cyan-600 transition-all text-sm"
               aria-label="Scroll to top"
             >
               ↑

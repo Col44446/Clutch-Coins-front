@@ -27,7 +27,7 @@ exports.getUserProfile = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    res.json({ success: true, data: user });
+    res.json({ success: true, user: user }); // Fix: return user object directly
   } catch (error) {
     console.error("Get User Profile Error:", error);
     res.status(500).json({ success: false, message: error.message });
