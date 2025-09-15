@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
+import SEOHead from '../components/common/SEOHead';
 import axios from 'axios';
 
 // Static games data matching homepage dummy games
@@ -208,17 +209,34 @@ function AllGames() {
     }
   };
 
+  const gamesStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Gaming Products",
+    "description": "Complete collection of gaming recharge and top-up services",
+    "url": "https://clutchcoins.com/games",
+    "numberOfItems": games.length,
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": games.slice(0, 10).map((game, index) => ({
+        "@type": "Product",
+        "position": index + 1,
+        "name": game.title,
+        "description": `Gaming recharge service for ${game.title}`,
+        "brand": game.publisher
+      }))
+    }
+  };
+
   return (
     <>
-      <Helmet>
-        <title>All Products - ClutchCoins</title>
-        <meta name="description" content="Explore all gaming products in ClutchCoins, sorted alphabetically from A to Z. Find your favorite games by title." />
-        <meta name="keywords" content="games, gaming products, clutchcoins, all products, alphabetic order" />
-        <meta property="og:title" content="All Products - ClutchCoins" />
-        <meta property="og:description" content="Browse our collection of gaming products sorted alphabetically with vibrant and interactive cards." />
-        <meta property="og:type" content="website" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Helmet>
+      <SEOHead
+        title="All Games - Gaming Recharge Services | ClutchCoins"
+        description="Browse our complete collection of gaming recharge services for popular games like PUBG, Valorant, Roblox, Minecraft and more. Fast, secure, and reliable top-up services."
+        keywords="all games, gaming recharge, game top-up services, PUBG mobile, Valorant, Roblox, Minecraft, gaming collection"
+        structuredData={gamesStructuredData}
+        type="webpage"
+      />
       <div className="min-h-screen bg-gray-900 text-white">
         <main className="container mx-auto p-4 sm:p-6 md:p-8">
           <motion.div

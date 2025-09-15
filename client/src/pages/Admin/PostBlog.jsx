@@ -103,9 +103,11 @@ function CreateBlogWithSidebar() {
                 <input
                   type="text"
                   id="title"
+                  name="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  className="w-full px-4 py-3 bg-gray-800 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                  placeholder="Enter blog title"
                   required
                 />
               </div>
@@ -115,6 +117,7 @@ function CreateBlogWithSidebar() {
                 </label>
                 <textarea
                   id="content"
+                  name="content"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 h-40 resize-y"
@@ -128,6 +131,7 @@ function CreateBlogWithSidebar() {
                 <input
                   type="file"
                   id="image"
+                  name="image"
                   onChange={handleImageChange}
                   className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   accept="image/*"

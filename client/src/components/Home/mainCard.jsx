@@ -121,10 +121,6 @@ function MainCard() {
         ))}
       </div>
 
-      {/* Keyboard navigation hint */}
-      <p className="text-xs text-gray-400 mt-2 opacity-75">
-        Use ← → arrow keys to navigate
-      </p>
     </section>
   );
 }

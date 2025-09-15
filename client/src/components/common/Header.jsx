@@ -119,7 +119,6 @@ function Header() {
   const role = localStorage.getItem("role");
   let navItems = [
     { to: "/games", label: "Games" },
-    { to: "/blogs", label: "Blogs" },
     { to: "/about", label: "About us" },
   ];
   if (isAuthenticated) {
@@ -219,8 +218,8 @@ function Header() {
 
   return (
     <>
-      <nav className="bg-gradient-to-b from-blue-900 via-blue-950 to-slate-950 p-3 fixed w-full top-0 z-50 shadow-lg">
-        <div className="max-w-7xl mx-auto flex flex-col gap-2">
+      <nav className="bg-gradient-to-b from-blue-900 via-blue-950 to-slate-950 p-2 sm:p-3 md:p-4 fixed w-full top-0 z-50 shadow-lg">
+        <div className="max-w-7xl mx-auto flex flex-col gap-1 sm:gap-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <motion.div
@@ -242,7 +241,7 @@ function Header() {
               <div className="flex flex-col items-start">
                 <Link
                   to="/"
-                  className="text-lg sm:text-2xl md:text-3xl font-bold text-white hover:text-cyan-300 transition-colors duration-200"
+                  className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold text-white hover:text-cyan-300 transition-colors duration-200"
                 >
                   Clutch <span className="text-cyan-500">Coins</span>
                 </Link>
@@ -250,7 +249,7 @@ function Header() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.3 }}
-                  className="text-left text-white text-xs sm:text-sm font-semibold tracking-wider select-none"
+                  className="text-left text-white text-xs sm:text-sm md:text-base font-semibold tracking-wider select-none"
                 >
                   INSTANT RECHARGE. INSTANT VICTORY!
                 </motion.div>
@@ -325,12 +324,13 @@ function Header() {
                   <div className="relative flex items-center gap-2">
                     <Search className="w-5 h-5 text-white" />
                     <input
+                      id="header-search-desktop"
+                      name="search"
                       type="text"
                       value={searchQuery}
                       placeholder="Search games..."
-                      className="bg-gray-800 text-white rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 w-full"
-                      onChange={handleSearch}
-                      onBlur={handleSearchBlur}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full bg-transparent text-white placeholder-gray-400 outline-none text-sm"
                     />
                     {showSearchDropdown && searchResults.length > 0 && (
                       <div className="absolute top-full left-6 mt-1 w-64 bg-gray-800 border border-gray-600 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
@@ -429,6 +429,8 @@ function Header() {
               <div className="relative flex items-center gap-2">
                 <Search className="w-5 h-5 text-white" />
                 <input
+                  id="header-search-mobile"
+                  name="search"
                   type="text"
                   value={searchQuery}
                   placeholder="Search games..."

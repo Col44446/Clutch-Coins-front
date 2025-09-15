@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet';
+import SEOHead from '../common/SEOHead';
 import { 
   FaGlobe, 
   FaBolt, 
@@ -317,12 +318,14 @@ const StaticGameDetails = memo(() => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCurrency, setSelectedCurrency] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [packages, setPackages] = useState([]);
   const [quantity, setQuantity] = useState(1);
+  const [popup, setPopup] = useState({ show: false, type: '', title: '', message: '' });
+  const [popupMessage, setPopupMessage] = useState('');
+  const [popupType, setPopupType] = useState('success');
+  const [addingToCart, setAddingToCart] = useState(false);
   const [showFullOffers, setShowFullOffers] = useState(false);
   const [userId, setUserId] = useState('');
-  const [popup, setPopup] = useState({ show: false, type: '', title: '', message: '' });
-  const [addingToCart, setAddingToCart] = useState(false);
 
   const toggleOffers = useCallback(() => setShowFullOffers(!showFullOffers), [showFullOffers]);
   
@@ -340,6 +343,11 @@ const StaticGameDetails = memo(() => {
   const handlePurchase = useCallback(async () => {
     if (!selectedCurrency) {
       showPopup('error', 'Selection Required', 'Please select a currency package first');
+      return;
+    }
+
+    if (!userId) {
+      showPopup('error', 'User ID Required', 'Please enter your User ID');
       return;
     }
 
@@ -381,6 +389,21 @@ const StaticGameDetails = memo(() => {
       showPopup('error', 'Authentication Required', 'Please login to add items to cart');
       return;
     }
+
+    const fetchPackages = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/packages`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setPackages(data.data);
+          }
+        }
+      } catch (err) {
+        // Fallback to game currencies if packages API fails
+        console.log('Using fallback currencies');
+      }
+    };
 
     setAddingToCart(true);
     try {
@@ -444,19 +467,29 @@ const StaticGameDetails = memo(() => {
     const fetchGame = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/games/page/${id}`);
-        if (!response.ok) {
-          throw new Error('Game not found');
+              // Get the game directly from staticGames using the URL parameter
+        const foundGame = staticGames[id];
+        if (foundGame) {
+          setGame({
+            ...foundGame,
+            // Ensure we have default values for all required fields
+            title: foundGame.title || 'Untitled Game',
+            publisher: foundGame.publisher || 'Unknown Publisher',
+            description: foundGame.description || 'No description available',
+            image: foundGame.image || '/src/assets/placeholder-game.jpg',
+            offers: foundGame.offers || [],
+            currencies: foundGame.currencies || []
+          });
+          setSelectedCurrency(foundGame.currencies?.[0] || null);
+          setError(null);
+        } else {
+          console.error('Game not found for ID:', id);
+          console.log('Available game IDs:', Object.keys(staticGames));
+          setError('Game not found');
         }
-        const data = await response.json();
-        setGame(data.data);
       } catch (err) {
-        setError(err.message);
-        // Fallback to static data if API fails
-        const staticGame = staticGames[id];
-        if (staticGame) {
-          setGame(staticGame);
-        }
+        console.error('Error loading game:', err);
+        setError('Failed to load game details');
       } finally {
         setLoading(false);
       }
@@ -473,10 +506,20 @@ const StaticGameDetails = memo(() => {
     );
   }
 
-  if (error && !game) {
+  if (error || !game) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-900 text-red-500 text-sm">
-        Game not found
+      <div className="flex flex-col justify-center items-center h-screen bg-gray-900 p-4 text-center">
+        <h2 className="text-red-500 text-xl font-bold mb-4">Game Not Found</h2>
+        <p className="text-gray-300 mb-6">We couldn't find the game you're looking for.</p>
+        <button 
+          onClick={() => navigate('/')}
+          className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+        >
+          Back to Home
+        </button>
+        <div className="mt-8 text-gray-500 text-xs">
+          <p>Available games: {Object.keys(staticGames).join(', ')}</p>
+        </div>
       </div>
     );
   }
@@ -640,32 +683,42 @@ const StaticGameDetails = memo(() => {
             </div>
 
             {/* Select Plan Section */}
-            <div className="bg-gray-800 p-3 rounded-lg shadow-lg">
-              <h2 className="text-lg font-bold mb-2 flex items-center gap-1">
-                <FaDollarSign className="text-cyan-500 text-base" />
-                Select Plan
+            <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-4 rounded-xl shadow-xl border border-gray-700">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+                <FaDollarSign className="text-cyan-500 text-lg" />
+                Select Package
               </h2>
-              <div className="flex flex-wrap gap-2">
-                {game.currencies.map((curr, index) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {(packages.length > 0 ? packages : game.currencies).map((curr, index) => (
                   <motion.button
                     key={index}
                     onClick={() => handleCurrencySelect(curr)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`flex-1 min-w-[100px] max-w-[150px] flex items-center gap-2 p-2 rounded-lg transition-colors ${
-                      selectedCurrency?.name === curr.name ? 'bg-cyan-700' : 'bg-gray-700 hover:bg-gray-600'
+                    whileHover={{ scale: 1.03, y: -2 }}
+                    whileTap={{ scale: 0.97 }}
+                    className={`relative p-4 rounded-xl transition-all duration-300 border-2 ${
+                      selectedCurrency?.name === curr.name 
+                        ? 'bg-gradient-to-br from-cyan-600 to-blue-700 border-cyan-400 shadow-lg shadow-cyan-500/25' 
+                        : 'bg-gradient-to-br from-gray-700 to-gray-800 border-gray-600 hover:border-cyan-500 hover:shadow-md'
                     }`}
                   >
-                    <img
-                      src={game.image}
-                      alt={game.title}
-                      className="w-8 h-8 object-contain rounded-lg"
-                      style={{ aspectRatio: '9/16' }}
-                      loading="lazy"
-                    />
-                    <div className="text-left">
-                      <p className="text-sm font-semibold">{curr.name}</p>
-                      <p className="text-xs text-cyan-400">${curr.amount.toFixed(2)}</p>
+                    {selectedCurrency?.name === curr.name && (
+                      <div className="absolute top-2 right-2">
+                        <FaCheckCircle className="text-cyan-300 text-lg" />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center border border-gray-600">
+                        <img
+                          src={game.image}
+                          alt={game.title}
+                          className="w-8 h-8 object-contain rounded"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="text-left flex-1">
+                        <p className="text-sm font-bold text-white mb-1">{curr.name}</p>
+                        <p className="text-lg font-bold text-cyan-400">${(curr.price || curr.amount).toFixed(2)}</p>
+                      </div>
                     </div>
                   </motion.button>
                 ))}
@@ -680,6 +733,8 @@ const StaticGameDetails = memo(() => {
                   <label className="block text-xs mb-1">Enter User ID (Numbers only)</label>
                   <input
                     type="text"
+                    id="userId"
+                    name="userId"
                     value={userId}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -693,32 +748,34 @@ const StaticGameDetails = memo(() => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs mb-1">Quantity</label>
-                  <div className="flex items-center gap-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Quantity</label>
+                  <div className="flex items-center gap-3 bg-gray-700 rounded-xl p-1">
                     <motion.button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded-lg flex items-center justify-center text-sm font-bold"
+                      whileHover={{ scale: 1.05, backgroundColor: "#374151" }}
+                      whileTap={{ scale: 0.95 }}
+                      className="w-10 h-10 bg-gray-600 hover:bg-gray-500 text-white rounded-lg flex items-center justify-center text-lg font-bold transition-all duration-200 shadow-md"
                     >
-                      -
+                      −
                     </motion.button>
-                    <input
-                      type="number"
-                      min="1"
-                      max="99"
-                      value={quantity}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value) || 1;
-                        setQuantity(Math.max(1, Math.min(99, value)));
-                      }}
-                      className="w-16 p-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-500 text-xs text-center"
-                    />
+                    <div className="flex-1 relative">
+                      <input
+                        type="number"
+                        min="1"
+                        max="99"
+                        value={quantity}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 1;
+                          setQuantity(Math.max(1, Math.min(99, value)));
+                        }}
+                        className="w-full py-2 px-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-center text-lg font-semibold border border-gray-600 transition-all duration-200"
+                      />
+                    </div>
                     <motion.button
                       onClick={() => setQuantity(Math.min(99, quantity + 1))}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="w-8 h-8 bg-gray-600 hover:bg-gray-500 text-white rounded-lg flex items-center justify-center text-sm font-bold"
+                      whileHover={{ scale: 1.05, backgroundColor: "#374151" }}
+                      whileTap={{ scale: 0.95 }}
+                      className="w-10 h-10 bg-gray-600 hover:bg-gray-500 text-white rounded-lg flex items-center justify-center text-lg font-bold transition-all duration-200 shadow-md"
                     >
                       +
                     </motion.button>
@@ -737,10 +794,6 @@ const StaticGameDetails = memo(() => {
                   <span className="font-semibold text-cyan-400">
                     ${selectedCurrency ? (selectedCurrency.amount * quantity).toFixed(2) : '0.00'}
                   </span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span>Discount:</span>
-                  <span className="text-green-500">0% (Dummy)</span>
                 </div>
                 <motion.button
                   onClick={handlePurchase}

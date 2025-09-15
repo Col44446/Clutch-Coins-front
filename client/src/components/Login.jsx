@@ -115,11 +115,13 @@ const Login = ({ onClose, onSwitch, onLogin }) => {
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
+                id="login-email"
+                name="email"
                 type="email"
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 p-2 rounded bg-gray-800 border border-gray-700 focus:outline-none focus:border-cyan-400"
+                className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-white placeholder-gray-400"
                 required
               />
             </div>
@@ -127,6 +129,8 @@ const Login = ({ onClose, onSwitch, onLogin }) => {
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
+                id="login-password"
+                name="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={password}

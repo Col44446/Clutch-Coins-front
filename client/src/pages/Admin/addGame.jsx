@@ -158,7 +158,7 @@ function AddGame({ isEdit = false }) {
 
       if (response.data.success) {
         setSuccess(true);
-        setTimeout(() => navigate('/admin/games'), 2000);
+        setTimeout(() => navigate('/admin/game'), 2000);
       } else {
         setError(response.data.message || `Failed to ${isEdit ? 'update' : 'create'} game`);
       }
@@ -217,10 +217,13 @@ function AddGame({ isEdit = false }) {
               <div>
                 <label className="block text-white text-lg font-medium mb-2">Title</label>
                 <input
+                  id="game-title"
+                  name="title"
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  placeholder="Enter game title"
                   required
                 />
               </div>
@@ -229,10 +232,13 @@ function AddGame({ isEdit = false }) {
               <div>
                 <label className="block text-white text-lg font-medium mb-2">Publisher</label>
                 <input
+                  id="game-publisher"
+                  name="publisher"
                   type="text"
                   value={publisher}
                   onChange={(e) => setPublisher(e.target.value)}
                   className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  placeholder="Enter publisher name"
                   required
                 />
               </div>
@@ -241,9 +247,12 @@ function AddGame({ isEdit = false }) {
               <div>
                 <label className="block text-white text-lg font-medium mb-2">Description</label>
                 <textarea
+                  id="game-description"
+                  name="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 h-40 resize-y"
+                  placeholder="Enter game description"
                   required
                 />
               </div>
@@ -255,6 +264,8 @@ function AddGame({ isEdit = false }) {
                 </label>
                 <div className="flex gap-2 mb-2">
                   <input
+                    id="offer-key"
+                    name="offerKey"
                     type="text"
                     placeholder="Offer Key (e.g. discount)"
                     value={offerKey}
@@ -262,6 +273,8 @@ function AddGame({ isEdit = false }) {
                     className="flex-1 p-2 bg-gray-800 text-white rounded"
                   />
                   <input
+                    id="offer-value"
+                    name="offerValue"
                     type="text"
                     placeholder="Offer Value (e.g. 10%)"
                     value={offerValue}
@@ -302,6 +315,8 @@ function AddGame({ isEdit = false }) {
                 </label>
                 <div className="flex gap-2 mb-2">
                   <input
+                    id="currency-name"
+                    name="currencyName"
                     type="text"
                     placeholder="Currency Name (e.g. USD)"
                     value={currencyName}
@@ -309,6 +324,8 @@ function AddGame({ isEdit = false }) {
                     className="flex-1 p-2 bg-gray-800 text-white rounded"
                   />
                   <input
+                    id="currency-amount"
+                    name="currencyAmount"
                     type="number"
                     placeholder="Amount"
                     value={currencyAmount}
@@ -350,6 +367,8 @@ function AddGame({ isEdit = false }) {
                   Image <span className="text-gray-400 text-sm">(optional)</span>
                 </label>
                 <input
+                  id="game-image"
+                  name="image"
                   type="file"
                   onChange={handleImageChange}
                   className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"

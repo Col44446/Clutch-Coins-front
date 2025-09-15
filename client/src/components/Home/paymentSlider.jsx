@@ -18,9 +18,19 @@ const PaymentSlider = () => {
 
   return (
     <section
-      className="relative overflow-hidden bg-white mb-8 py-4"
+      className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-slate-900 to-blue-900 mb-8 py-8 rounded-2xl shadow-2xl border border-gray-700/50"
       aria-label="Supported payment methods"
     >
+      {/* Professional header */}
+      <div className="text-center mb-6">
+        <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+          Secure Payment Methods
+        </h3>
+        <p className="text-gray-300 text-sm sm:text-base">
+          We support multiple payment options for your convenience
+        </p>
+      </div>
+
       <style>{`
         @keyframes slideLeft {
           0% { transform: translateX(0); }
@@ -29,29 +39,51 @@ const PaymentSlider = () => {
         .animate-slide-left {
           display: flex;
           flex-wrap: nowrap;
+          animation: slideLeft 20s linear infinite;
         }
-        
+        .animate-slide-left:hover {
+          animation-play-state: paused;
+        }
       `}</style>
 
       {/* Left fade overlay */}
-      <div className="absolute left-0 top-0 h-full w-16 sm:w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+      <div className="absolute left-0 top-0 h-full w-16 sm:w-20 bg-gradient-to-r from-gray-900 to-transparent z-10 pointer-events-none"></div>
+
+      {/* Right fade overlay */}
+      <div className="absolute right-0 top-0 h-full w-16 sm:w-20 bg-gradient-to-l from-gray-900 to-transparent z-10 pointer-events-none"></div>
 
       {/* Track container */}
       <div className="animate-slide-left">
         {/* Duplicate list to make infinite loop seamless */}
-        {[...payments, ...payments].map((item, index) => (
+        {[...payments, ...payments, ...payments].map((item, index) => (
           <div
             key={index}
-            className="flex items-center justify-center mx-3 sm:mx-4 flex-shrink-0"
+            className="flex items-center justify-center mx-4 sm:mx-6 flex-shrink-0 bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/20 hover:bg-white/20 transition-all duration-300"
           >
             <img
               src={item.src}
               alt={item.alt}
-              className="h-6 w-auto sm:h-8 object-contain transition-opacity duration-300 hover:opacity-100 opacity-50"
+              className="h-8 w-auto sm:h-10 md:h-12 object-contain transition-all duration-300 hover:scale-110 filter brightness-110"
               loading="lazy"
             />
           </div>
         ))}
+      </div>
+
+      {/* Security badges */}
+      <div className="flex justify-center items-center mt-6 gap-4 text-gray-300">
+        <div className="flex items-center gap-2">
+          <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+          </svg>
+          <span className="text-sm font-medium">SSL Encrypted</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+          <span className="text-sm font-medium">Verified Secure</span>
+        </div>
       </div>
     </section>
   );

@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import pic1 from '../../assets/temp-18.png';
 import pic2 from '../../assets/temp-19.png';
 import pic3 from '../../assets/temp-20.png';
@@ -155,13 +155,13 @@ function PopularGames() {
                 >
                     Trending Games
                 </h2>
-                <a
-                    href="/games"
+                <Link
+                    to="/games"
                     className="px-4 py-2 sm:px-6 sm:py-2 bg-gradient-to-r from-cyan-500 via-blue-500 to-blue-800 text-white text-responsive-sm font-semibold rounded-full shadow-md hover:from-cyan-300 hover:via-blue-400 hover:to-blue-500 hover:shadow-lg hover:scale-105 transform transition-all duration-300 ease-in-out touch-manipulation"
                     aria-label="Explore more trending games"
                 >
                     Explore →
-                </a>
+                </Link>
             </div>
 
             {/* Cards Row with Arrows */}

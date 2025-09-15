@@ -33,6 +33,7 @@ import Login from "./components/Login";
 import Signup from "./components/LogSign";
 import OTPVerify from "./components/OTPVerify";
 import AdminRoute from "./components/AdminRoute";
+import PackageButtons from "./pages/Admin/PackageButtons";
 
 // Policy & Info Pages
 import Terms from './components/Policies/Terms';
@@ -84,6 +85,7 @@ function App() {
         <Route path="/blog-post" element={<AdminRoute><CreateBlog /></AdminRoute>} />
         <Route path="/admin/game" element={<AdminRoute><AllGames /></AdminRoute>} />
         <Route path="/admin/game/add" element={<AdminRoute><AddGame /></AdminRoute>} />
+        <Route path="/admin/packages" element={<AdminRoute><PackageButtons /></AdminRoute>} />
         <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         
         {/* 404 Catch-all route */}

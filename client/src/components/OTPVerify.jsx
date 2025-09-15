@@ -85,16 +85,20 @@ const OTPVerify = () => {
           <div>
             <label className="block text-sm font-medium text-cyan-200">Email</label>
             <input
+              id="otp-email"
+              name="email"
               type="email"
               value={email}
               disabled
-              className="mt-1 block w-full rounded-lg border border-cyan-500/30 bg-slate-950 text-white placeholder-gray-500 shadow-sm focus:border-cyan-500 focus:ring focus:ring-cyan-400/40 p-2"
+              className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-cyan-200">OTP</label>
             <input
+              id="otp-code"
+              name="otp"
               type="text"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}

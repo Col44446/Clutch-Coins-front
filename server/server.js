@@ -2,14 +2,16 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const passport = require("passport");
+
 const http = require("http");
 const { Server } = require("socket.io");
 require("dotenv").config();
 
 const connectDB = require("./config/db");
-const adminRoutes = require("./routes/adminRouts");
-const blogRoutes = require("./routes/blogRoutses");
-const gameRoutes = require("./routes/gameRoutes");
+const blogRoutes = require('./routes/blogRoutses');
+const adminRoutes = require('./routes/adminRouts');
+const packageRoutes = require('./routes/packages');
+const gameRoutes = require('./routes/gameRoutes');
 const userRoutes = require("./routes/userRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const messageRoutes = require("./routes/messageRoutes");
@@ -49,6 +51,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/packages", packageRoutes);
 
 // Error handler
 app.use(errorHandler);

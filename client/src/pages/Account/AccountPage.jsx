@@ -279,25 +279,31 @@ const AccountPage = () => {
                   )}
                 </div>
 
-                <div className="space-y-4">
+                {/* Profile Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-gray-400 text-sm mb-1">Name</label>
+                    <label htmlFor="account-name" className="block text-gray-400 text-sm mb-1">Name</label>
                     {isEditing ? (
                       <input
+                        id="account-name"
+                        name="name"
                         type="text"
                         value={editForm.name}
                         onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                        className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-cyan-400 focus:outline-none"
+                        className="w-full px-3 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-cyan-500 focus:outline-none"
+                        placeholder="Enter your name"
                       />
                     ) : (
-                      <p className="text-white font-medium">{user?.name || 'Not provided'}</p>
+                      <p className="text-white font-medium">{user?.name}</p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-gray-400 text-sm mb-1">Email</label>
+                    <label htmlFor="account-email" className="block text-gray-400 text-sm mb-1">Email</label>
                     {isEditing ? (
                       <input
+                        id="account-email"
+                        name="email"
                         type="email"
                         value={editForm.email}
                         onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}

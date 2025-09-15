@@ -25,14 +25,13 @@ function Sidebar() {
     window.location.href = "/login"; // logout and redirect
   };
 
-  const navItems = [
-    { to: '/admin-dashboard', label: 'Dashboard', icon: HomeIcon },
-    { to: '/blog-post', label: 'Post Blog', icon: DocumentTextIcon },
-    { to: '/admin/game', label: 'All Games', icon: Squares2X2Icon },
-    { to: '/admin/game/add', label: 'Add Game', icon: PlusCircleIcon },
-    { to: '/admin/users', label: 'Users', icon: UsersIcon },
-    { to: '/admin/settings', label: 'Settings', icon: CogIcon },
-    { to: '#', label: 'Logout', icon: ArrowLeftOnRectangleIcon, action: handleLogout },
+  const menuItems = [
+    { icon: LayoutDashboard, label: 'Dashboard', to: '/admin-dashboard' },
+    { icon: GamepadIcon, label: 'All Games', to: '/admin/game' },
+    { icon: PlusCircle, label: 'Add Game', to: '/admin/game/add' },
+    { icon: FileText, label: 'Create Blog', to: '/blog-post' },
+    { icon: PlusCircle, label: 'Package Buttons', to: '/admin/packages' },
+    { icon: LogOut, label: 'Logout', action: handleLogout },
   ];
 
   const sidebarVariants = {

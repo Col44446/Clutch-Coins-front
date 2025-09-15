@@ -383,7 +383,7 @@ const Messages = () => {
             <footer className="flex gap-1 sm:gap-2 p-2 sm:p-3 bg-gray-50 rounded-xl shadow-[0_-2px_4px_rgba(0,0,0,0.05)] sticky bottom-0 z-10 relative">
               <label className="flex items-center justify-center p-2 sm:p-3 bg-white border border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all touch-manipulation">
                 <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
-                <input type="file" accept="image/*,video/mp4,application/pdf,audio/mp3,audio/webm,audio/ogg" onChange={handleFileChange} ref={fileInputRef} className="hidden" aria-label="File upload" />
+                <input id="message-file-upload" name="file" type="file" accept="image/*,video/mp4,application/pdf,audio/mp3,audio/webm,audio/ogg" onChange={handleFileChange} ref={fileInputRef} className="hidden" aria-label="File upload" />
               </label>
               <motion.button
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -405,13 +405,16 @@ const Messages = () => {
               </motion.button>
               <div className="relative flex-1">
                 <input
+                  id="message-text-input"
+                  name="message"
                   type="text"
                   value={input}
                   onChange={handleTyping}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Type your message..."
-                  className={`w-full p-2 sm:p-3 rounded-lg bg-white text-gray-800 text-xs sm:text-sm outline-none border ${badWordsFilter.isProfane(input) || restrictedKeywords.some((k) => input.toLowerCase().includes(k)) ? "border-red-500" : "border-gray-300 focus:border-blue-500"} focus:ring-1 focus:ring-blue-200 transition-all placeholder-gray-400 touch-manipulation`}
-                  aria-label="Chat message input"
+                  onKeyDown={handleKeyDown}
+                  placeholder="Type a message..."
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm sm:text-base resize-none bg-white"
+                  disabled={isRecording}
+                  aria-label="Message input"
                 />
                 {showEmojiPicker && (
                   <div ref={emojiPickerRef} className="absolute bottom-12 sm:bottom-16 left-0 z-20 w-full sm:w-auto">

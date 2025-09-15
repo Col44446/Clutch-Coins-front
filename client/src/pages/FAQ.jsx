@@ -79,7 +79,7 @@ const FAQ = () => {
           <h1 className="text-3xl font-bold text-white mb-4">Frequently Asked Questions</h1>
           <p className="text-gray-300">
             Find answers to common questions about ClutchCoins. Can't find what you're looking for? 
-            <a href="/contact" className="text-cyan-400 hover:text-cyan-300 ml-1">Contact our support team</a>.
+            <a href="mailto:support@clutchcoins.com" className="text-cyan-400 hover:text-cyan-300 ml-1">Contact our support team</a>.
           </p>
         </div>
         

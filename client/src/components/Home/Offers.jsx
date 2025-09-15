@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import pic1 from '../../assets/temp-1.png';
 import pic2 from '../../assets/temp-2.jpg';
 import pic3 from '../../assets/temp-3.png';
@@ -50,8 +51,8 @@ function Offers() {
         >
           Top Deals
         </h2>
-        <a
-          href="/offers"
+        <Link
+          to="/games"
           className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-cyan-500 to-blue-600 
           text-white text-xs sm:text-sm font-semibold rounded-full shadow-md 
           hover:from-cyan-400 hover:to-blue-500 hover:shadow-lg hover:scale-105 
@@ -59,7 +60,7 @@ function Offers() {
           aria-label="Explore more deals"
         >
           Discover More →
-        </a>
+        </Link>
       </div>
 
       {/* Cards */}

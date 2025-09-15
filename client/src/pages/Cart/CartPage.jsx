@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Trash2, Plus, Minus, CreditCard, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import SEOHead from '../../components/common/SEOHead';
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -169,22 +170,37 @@ const CartPage = () => {
     );
   }
 
+  const cartStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Shopping Cart",
+    "description": "Review your gaming recharge items and proceed to checkout",
+    "url": "https://clutchcoins.com/cart"
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black pt-32 pb-24">
-      <div className="container mx-auto px-4 max-w-4xl">
+      <SEOHead
+        title="Shopping Cart - ClutchCoins"
+        description="Review your gaming recharge items, update quantities, and proceed to secure checkout. Fast and reliable gaming top-up services."
+        keywords="shopping cart, gaming recharge checkout, game top-up cart, secure payment"
+        structuredData={cartStructuredData}
+        type="webpage"
+      />
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 max-w-4xl">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-8">
           <motion.button
             onClick={() => navigate(-1)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300"
+            className="flex items-center gap-1 sm:gap-2 text-cyan-400 hover:text-cyan-300 text-sm sm:text-base"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             Back
           </motion.button>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <ShoppingCart className="w-8 h-8 text-cyan-400" />
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white flex items-center gap-2 sm:gap-3">
+            <ShoppingCart className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-cyan-400" />
             Your Cart
           </h1>
         </div>
@@ -201,7 +217,7 @@ const CartPage = () => {
             <h2 className="text-xl font-semibold text-gray-400 mb-2">Your cart is empty</h2>
             <p className="text-gray-500 mb-6">Add some games to get started!</p>
             <motion.button
-              onClick={() => navigate('/game')}
+              onClick={() => navigate('/games')}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-3 rounded-lg font-semibold"

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import game1 from '../../assets/temp-28.jpg'; // Adjust paths based on your project
@@ -112,12 +112,35 @@ const games = [
 const GameCard = () => {
     const navigate = useNavigate();
     const [showAll, setShowAll] = useState(false);
+    const [visibleGames, setVisibleGames] = useState(4);
 
     const handleGameClick = (gameId) => {
         navigate(`/game/${gameId}`);
     };
 
-    const displayedGames = showAll ? games : games.slice(0, 4);
+    // Dynamic game count based on screen size
+    useEffect(() => {
+        const updateVisibleGames = () => {
+            const width = window.innerWidth;
+            if (width >= 1280) { // xl
+                setVisibleGames(showAll ? games.length : 12);
+            } else if (width >= 1024) { // lg
+                setVisibleGames(showAll ? games.length : 10);
+            } else if (width >= 768) { // md
+                setVisibleGames(showAll ? games.length : 8);
+            } else if (width >= 640) { // sm
+                setVisibleGames(showAll ? games.length : 6);
+            } else { // mobile
+                setVisibleGames(showAll ? games.length : 4);
+            }
+        };
+
+        updateVisibleGames();
+        window.addEventListener('resize', updateVisibleGames);
+        return () => window.removeEventListener('resize', updateVisibleGames);
+    }, [showAll]);
+
+    const displayedGames = games.slice(0, visibleGames);
 
     return (
         <section className="bg-gradient-to-br from-gray-950 via-slate-950 to-blue-950 min-h-screen flex flex-col items-start justify-center container-responsive p-responsive relative overflow-hidden">
@@ -127,28 +150,37 @@ const GameCard = () => {
             <div className='bg-gray-900 p-responsive rounded-2xl w-full'>
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none"></div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-responsive max-w-7xl mx-auto">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 max-w-7xl mx-auto">
                     {displayedGames.map((game, index) => (
                         <article
                             key={index}
-                            className="rounded-xl overflow-hidden cursor-pointer transform hover:scale-105 transition-transform duration-300"
+                            className="min-w-[160px] sm:min-w-[200px] bg-indigo-950/60 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-white/10 overflow-hidden group relative cursor-pointer"
                             onClick={() => handleGameClick(game.id)}
                         >
-                            {/* Image with border */}
-                            <div className="border-2 border-cyan-600/50 hover:border-cyan-300 transition-colors duration-300 rounded-xl overflow-hidden touch-manipulation">
+                            {/* Blue Gradient Light Effect (Always over image) */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/40 via-blue-700/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out z-10"></div>
+
+                            {/* Image */}
+                            <div className="relative h-56 sm:h-78">
                                 <img
                                     src={game.image}
                                     alt={`${game.title} game cover`}
-                                    className="w-full h-32 sm:h-40 md:h-48 lg:h-56 object-cover hover:scale-110 transition-transform duration-300"
+                                    className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                                    style={{ aspectRatio: '9/16' }}
                                     loading="lazy"
                                 />
-                            </div>
 
-                            {/* Title below the image */}
-                            <div className="p-2 text-center">
-                                <h2 className="text-responsive-sm font-bold text-white line-clamp-1">
+                                {/* Top Up Button */}
+                                <div className="absolute mb-7 bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 z-30 transition-all duration-500">
+                                    <button className="px-4 py-1 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs sm:text-sm font-semibold rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-transform duration-300">
+                                        Top Up
+                                    </button>
+                                </div>
+
+                                {/* Game Name */}
+                                <div className="absolute bottom-0 left-0 w-full bg-gradient-to-b from-black/80 to-transparent text-white text-center py-2 text-xs sm:text-sm font-bold drop-shadow-sm z-20">
                                     {game.title}
-                                </h2>
+                                </div>
                             </div>
                         </article>
                     ))}

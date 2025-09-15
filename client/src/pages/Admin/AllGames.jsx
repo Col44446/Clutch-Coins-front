@@ -150,7 +150,7 @@ function AllGames() {
                     <h3 className="text-lg sm:text-xl font-semibold text-white flex-1 truncate">{game.title}</h3>
                     <div className="flex space-x-2 sm:space-x-4">
                       <motion.button
-                        onClick={() => navigate(`/admin/games/edit/${game._id}`)}
+                        onClick={() => navigate(`/admin/game/add`)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className="py-2 px-3 sm:px-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-lg text-xs sm:text-sm"

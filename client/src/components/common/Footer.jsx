@@ -9,11 +9,11 @@ import p4 from '../../assets/p4.png';
 
 const Footer = () => {
     return (
-        <footer className="bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white py-8 px-4 sm:px-6 md:px-10 shadow-[0_0_15px_rgba(0,255,255,0.2)] animate-pulse-slow">
-            <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6">
+        <footer className="bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white py-6 sm:py-8 md:py-10 px-4 sm:px-6 md:px-8 lg:px-10 shadow-[0_0_15px_rgba(0,255,255,0.2)] animate-pulse-slow">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8">
                 {/* Company Info Section */}
                 <section className="border-l-4 border-blue-800 pl-3" aria-labelledby="company-heading">
-                    <h3 id="company-heading" className="text-xl font-bold text-white mb-4">ClutchCoins</h3>
+                    <h3 id="company-heading" className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">ClutchCoins</h3>
                     <nav aria-label="Company links">
                         <ul className="space-y-2 text-sm">
                             <li>
@@ -32,8 +32,8 @@ const Footer = () => {
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/security" className="hover:text-cyan-400 transition-colors duration-200">
-                                    Secure Payments
+                                <Link to="/faq" className="hover:text-cyan-400 transition-colors duration-200">
+                                    FAQs
                                 </Link>
                             </li>
                         </ul>
@@ -42,7 +42,7 @@ const Footer = () => {
 
                 {/* Support Section */}
                 <section className="border-l-4 border-blue-800 pl-3" aria-labelledby="support-heading">
-                    <h3 id="support-heading" className="text-xl font-bold text-white mb-4">Support</h3>
+                    <h3 id="support-heading" className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Support</h3>
                     <nav aria-label="Support links">
                         <ul className="space-y-2 text-sm">
                             <li>
@@ -65,18 +65,13 @@ const Footer = () => {
                                     Return Policy
                                 </Link>
                             </li>
-                            <li>
-                                <Link to="/faq" className="hover:text-cyan-400 transition-colors duration-200">
-                                    FAQs
-                                </Link>
-                            </li>
                         </ul>
                     </nav>
                 </section>
 
                 {/* Contact Section */}
                 <section className="border-l-4 border-blue-800 pl-3" aria-labelledby="contact-heading">
-                    <h3 id="contact-heading" className="text-xl font-bold text-white mb-4">Contact Us</h3>
+                    <h3 id="contact-heading" className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Contact Us</h3>
                     <nav aria-label="Contact links">
                         <ul className="space-y-2 text-sm">
                             <li>
@@ -96,7 +91,7 @@ const Footer = () => {
 
                 {/* Partnership Section */}
                 <section className="border-l-4 border-blue-800 pl-3" aria-labelledby="partnership-heading">
-                    <h3 id="partnership-heading" className="text-xl font-bold text-white mb-4">Partnerships</h3>
+                    <h3 id="partnership-heading" className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Partnerships</h3>
                     <nav aria-label="Partnership links">
                         <ul className="space-y-2 text-sm">
                             <li>
@@ -112,7 +107,7 @@ const Footer = () => {
                 {/* Newsletter & Payments Section */}
                 <section className="border-l-4 border-blue-800 pl-3 flex flex-col justify-between" aria-labelledby="newsletter-heading">
                     <div>
-                        <h3 id="newsletter-heading" className="text-xl font-bold text-white mb-4">Exclusive Game Offers</h3>
+                        <h3 id="newsletter-heading" className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Exclusive Game Offers</h3>
                         <div className="flex mb-4">
                             <input
                                 type="email"
@@ -126,7 +121,7 @@ const Footer = () => {
                         </div>
                     </div>
                     <div>
-                        <h4 className="text-lg font-semibold text-white mb-3">Accepted Payments</h4>
+                        <h4 className="text-base sm:text-lg font-semibold text-white mb-2 sm:mb-3">Accepted Payments</h4>
                         <div className="flex flex-wrap gap-2">
                             <img src={p1} alt="PayPal" className="w-7 h-5 object-contain rounded-sm hover:opacity-85 transition-opacity duration-200" loading="lazy" />
                             <img src={p2} alt="Visa" className="w-7 h-5 object-contain rounded-sm hover:opacity-85 transition-opacity duration-200" loading="lazy" />
@@ -137,9 +132,9 @@ const Footer = () => {
                 </section>
             </div>
 
-            <div className="mt-8 flex flex-col sm:flex-row justify-between items-center max-w-7xl mx-auto text-sm text-gray-300">
-                <div className="mb-4 sm:mb-0 flex items-center space-x-4">
-                    <span className="font-medium">Connect With Us</span>
+            <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-between items-center max-w-7xl mx-auto text-xs sm:text-sm text-gray-300 gap-4 sm:gap-0">
+                <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                    <span className="font-medium text-center sm:text-left">Connect With Us</span>
                     <div className="flex space-x-3">
                         <a href="https://facebook.com/clutchcoins" className="hover:text-cyan-400 transition-colors duration-200" aria-label="Follow us on Facebook" rel="nofollow">
                             <FontAwesomeIcon icon={faFacebookF} size="lg" aria-hidden="true" />
