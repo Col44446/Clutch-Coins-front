@@ -12,7 +12,7 @@ exports.loginAdmin = (req, res) => {
     const { email, password } = req.body;
 
     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        const token = jwt.sign({ role: "admin", email }, SECRET_KEY, { expiresIn: "1h" });
+        const token = jwt.sign({ userId: "admin123", role: "admin", email }, SECRET_KEY, { expiresIn: "1h" });
         return res.json({
             success: true,
             role: "admin",

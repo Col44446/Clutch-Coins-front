@@ -7,9 +7,7 @@ import Sidebar from './sidebar';
 
 function AllGames() {
   const token = localStorage.getItem("token");
-  if (!token) return <Navigate to="/login" replace />;
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
+  const navigate = useNavigate();
   const [games, setGames] = useState([]);
   const [filteredGames, setFilteredGames] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,11 +15,9 @@ function AllGames() {
   const [error, setError] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
-  // Fetch all games
   useEffect(() => {
     const fetchGames = async () => {
       setLoading(true);
@@ -40,7 +36,6 @@ function AllGames() {
     fetchGames();
   }, [token, API_BASE_URL]);
 
-  // Handle search
   useEffect(() => {
     setFilteredGames(
       games.filter((game) =>
@@ -48,8 +43,6 @@ function AllGames() {
       )
     );
   }, [searchTerm, games]);
-
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   const handleDelete = async () => {
     try {
@@ -69,100 +62,70 @@ function AllGames() {
     setShowModal(true);
   };
 
+  if (!token) return <Navigate to="/login" replace />;
+
   return (
     <>
       <Helmet>
         <title>All Games - Game Zone Admin</title>
-        <meta name="description" content="Manage and view all games in the Game Zone admin panel. Edit or delete games easily." />
-        <meta name="keywords" content="game zone, admin panel, manage games, game list" />
-        <meta name="robots" content="noindex, nofollow" />
-        <meta property="og:title" content="All Games - Game Zone Admin" />
-        <meta property="og:description" content="View and manage all games in the Game Zone admin panel." />
-        <meta property="og:type" content="website" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            "itemListElement": games.map((game, index) => ({
-              "@type": "ListItem",
-              "position": index + 1,
-              "item": {
-                "@type": "Game",
-                "name": game.title,
-                "image": game.image || '',
-              },
-            })),
-          })}
-        </script>
+        <meta name="description" content="Manage and view all games in the Game Zone admin panel." />
+        <meta name="robots" content="noindex" />
       </Helmet>
-      <div className="flex min-h-screen bg-gray-900">
-        <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        <main
-          className={`flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto transition-all duration-300 ${
-            isSidebarOpen ? 'md:ml-64' : 'md:ml-16'
-          } mt-16 sm:mt-20 md:mt-24`}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-4xl mx-auto"
-          >
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-6">
+      <div className="min-h-screen bg-gray-900 flex mt-14">
+        <main className="flex-1 pt-16 pb-6 px-4 sm:px-6 lg:pr-8 max-w-2xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <h1 className="text-2xl font-bold text-white mb-4">
               All Games <span className="text-cyan-500">List</span>
             </h1>
             {error && (
-              <div className="bg-red-500 text-white p-3 mb-4 rounded-lg" role="alert">
+              <div className="bg-red-500/20 text-red-300 p-2 mb-3 rounded" role="alert">
                 {error}
               </div>
             )}
-            <div className="mb-6">
+            <div className="mb-4">
               <input
                 type="text"
                 placeholder="Search by game title..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm sm:text-base"
+                className="w-full p-2 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
                 aria-label="Search games"
               />
             </div>
             {loading ? (
-              <div className="text-white text-center text-sm sm:text-base">Loading...</div>
+              <div className="text-white text-center text-sm">Loading...</div>
             ) : (
-              <ul className="space-y-3">
+              <ul className="space-y-2">
                 {filteredGames.map((game) => (
                   <motion.li
                     key={game._id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="bg-gray-800 rounded-lg p-4 flex items-center space-x-4"
+                    className="bg-gray-800 rounded p-3 flex items-center space-x-3"
                   >
                     {game.image && (
                       <img
                         src={game.image}
                         alt={`Cover for ${game.title}`}
                         loading="lazy"
-                        className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-full"
+                        className="w-10 h-10 object-cover rounded"
                       />
                     )}
-                    <h3 className="text-lg sm:text-xl font-semibold text-white flex-1 truncate">{game.title}</h3>
-                    <div className="flex space-x-2 sm:space-x-4">
+                    <h3 className="text-base font-semibold text-white flex-1 truncate">{game.title}</h3>
+                    <div className="flex space-x-2">
                       <motion.button
-                        onClick={() => navigate(`/admin/game/add`)}
+                        onClick={() => navigate(`/admin/game/add/${game._id}`)}
                         whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="py-2 px-3 sm:px-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-lg text-xs sm:text-sm"
+                        className="py-1 px-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded text-xs"
                         aria-label={`Edit ${game.title}`}
                       >
-                        Update
+                        Edit
                       </motion.button>
                       <motion.button
                         onClick={() => openDeleteModal(game._id)}
                         whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="py-2 px-3 sm:px-4 bg-red-500 text-white font-bold rounded-lg text-xs sm:text-sm"
+                        className="py-1 px-2 bg-red-500 hover:bg-red-600 text-white rounded text-xs"
                         aria-label={`Delete ${game.title}`}
                       >
                         Delete
@@ -178,17 +141,16 @@ function AllGames() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
             >
-              <div className="bg-gray-800 p-6 rounded-lg max-w-sm w-full">
-                <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">Confirm Deletion</h2>
-                <p className="text-white mb-6 text-sm sm:text-base">Are you sure you want to delete this game?</p>
-                <div className="flex justify-end space-x-4">
+              <div className="bg-gray-800 p-4 rounded max-w-xs w-full">
+                <h2 className="text-lg font-bold text-white mb-3">Confirm Deletion</h2>
+                <p className="text-white text-sm mb-4">Are you sure you want to delete this game?</p>
+                <div className="flex justify-end space-x-2">
                   <motion.button
                     onClick={() => setShowModal(false)}
                     whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="py-2 px-4 bg-gray-600 text-white rounded-lg text-sm sm:text-base"
+                    className="py-1 px-3 bg-gray-600 text-white rounded text-sm"
                     aria-label="Cancel deletion"
                   >
                     Cancel
@@ -196,8 +158,7 @@ function AllGames() {
                   <motion.button
                     onClick={handleDelete}
                     whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="py-2 px-4 bg-red-500 text-white rounded-lg text-sm sm:text-base"
+                    className="py-1 px-3 bg-red-500 text-white rounded text-sm"
                     aria-label="Confirm deletion"
                   >
                     Delete
@@ -207,6 +168,7 @@ function AllGames() {
             </motion.div>
           )}
         </main>
+        <Sidebar className="fixed right-0 top-0 h-screen z-40 hidden lg:block" />
       </div>
     </>
   );

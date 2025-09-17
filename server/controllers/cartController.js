@@ -22,30 +22,44 @@ exports.getCart = async (req, res) => {
 // Add item to cart
 exports.addToCart = async (req, res) => {
   try {
+    console.log('Cart add request received:', {
+      userId: req.user?.id,
+      body: req.body,
+      headers: req.headers.authorization ? 'Present' : 'Missing'
+    });
+
     const userId = req.user.id;
     const { gameId, gameName, gamePageName, gameImage, currencyName, amount, gameUserId, quantity = 1 } = req.body;
 
     // Validate required fields
     if (!gameId) {
+      console.log('Validation failed: Game ID missing');
       return res.status(400).json({ success: false, message: "Game ID is required" });
     }
     if (!currencyName) {
+      console.log('Validation failed: Currency name missing');
       return res.status(400).json({ success: false, message: "Currency name is required" });
     }
     if (!amount || amount <= 0) {
+      console.log('Validation failed: Invalid amount:', amount);
       return res.status(400).json({ success: false, message: "Valid amount is required" });
     }
     if (!gameUserId || gameUserId.trim() === '') {
+      console.log('Validation failed: Game User ID missing');
       return res.status(400).json({ success: false, message: "Game User ID is required" });
     }
 
+    console.log('Searching for game with ID:', gameId);
     const game = await Game.findById(gameId);
     if (!game) {
+      console.log('Game not found with ID:', gameId);
       return res.status(404).json({ success: false, message: "Game not found" });
     }
 
+    console.log('Game found:', game.title);
     let cart = await Cart.findOne({ userId });
     if (!cart) {
+      console.log('Creating new cart for user:', userId);
       cart = new Cart({ userId, items: [] });
     }
 
@@ -58,10 +72,12 @@ exports.addToCart = async (req, res) => {
 
     if (existingItemIndex > -1) {
       // Update quantity if item exists
-      cart.items[existingItemIndex].quantity += quantity;
+      console.log('Updating existing cart item quantity');
+      cart.items[existingItemIndex].quantity += parseInt(quantity);
     } else {
       // Add new item with all required fields
-      cart.items.push({
+      console.log('Adding new item to cart');
+      const newItem = {
         gameId,
         gameName: gameName || game.title,
         gamePageName: gamePageName || game.pageName || game.title,
@@ -70,17 +86,25 @@ exports.addToCart = async (req, res) => {
         amount: parseFloat(amount),
         quantity: parseInt(quantity),
         gameUserId: gameUserId.trim()
-      });
+      };
+      console.log('New cart item:', newItem);
+      cart.items.push(newItem);
     }
 
+    console.log('Saving cart...');
     await cart.save();
+    console.log('Cart saved successfully');
     res.json({ success: true, data: cart, message: 'Item added to cart successfully' });
   } catch (error) {
-    console.error('Cart add error:', error);
+    console.error('Cart add error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     res.status(500).json({ 
       success: false, 
       message: 'Failed to add item to cart',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
     });
   }
 };

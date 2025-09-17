@@ -45,6 +45,7 @@ import HowToUse from './pages/HowToUse';
 import DeliveryInfo from './pages/DeliveryInfo';
 import NotFound from './pages/NotFound';
 import AuthCallback from './pages/AuthCallback';
+import HomeGames from './pages/Admin/HomeGames';
 
 function App() {
   return (
@@ -88,7 +89,8 @@ function App() {
         <Route path="/admin/game/add" element={<AdminRoute><AddGame /></AdminRoute>} />
         <Route path="/admin/packages" element={<AdminRoute><PackageButtons /></AdminRoute>} />
         <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-        
+        <Route path="/admin/home-games" element={<AdminRoute><HomeGames /></AdminRoute>} />
+
         {/* 404 Catch-all route */}
         <Route path="*" element={<NotFound />} />
       </Routes>

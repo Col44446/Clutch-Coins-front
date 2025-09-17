@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 import { 
   FaUsers, 
@@ -13,12 +13,9 @@ import {
   FaChartLine,
   FaBell,
   FaUserPlus,
-  FaDownload,
-  FaExclamationTriangle
+  FaDownload
 } from 'react-icons/fa';
-import Sidebar from "./sidebar";
-import { Navigate } from "react-router-dom";
-
+import Sidebar from './sidebar';
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [dashboardData, setDashboardData] = useState({
@@ -31,40 +28,28 @@ const AdminDashboard = () => {
     games: []
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!localStorage.getItem('token')) {
       window.location.href = '/login';
       return;
     }
-
     fetchDashboardData();
   }, []);
 
   const fetchDashboardData = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
       const token = localStorage.getItem('token');
       const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-
-      // Fetch multiple endpoints in parallel
       const [usersRes, gamesRes, ordersRes] = await Promise.allSettled([
-        fetch(`${baseURL}/api/users/all`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }),
-        fetch(`${baseURL}/api/games`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }),
-        fetch(`${baseURL}/api/cart/all-orders`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
+        fetch(`${baseURL}/users/all`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${baseURL}/games`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${baseURL}/cart/all-orders`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
 
-      // Process users data
-      let totalUsers = 0;
-      let recentUsers = [];
+      let totalUsers = 0, recentUsers = [], totalGames = 0, games = [], totalOrders = 0, totalRevenue = 0, recentOrders = [];
+
       if (usersRes.status === 'fulfilled' && usersRes.value.ok) {
         const usersData = await usersRes.value.json();
         if (usersData.success) {
@@ -82,9 +67,6 @@ const AdminDashboard = () => {
         }
       }
 
-      // Process games data
-      let totalGames = 0;
-      let games = [];
       if (gamesRes.status === 'fulfilled' && gamesRes.value.ok) {
         const gamesData = await gamesRes.value.json();
         if (gamesData.success) {
@@ -101,10 +83,6 @@ const AdminDashboard = () => {
         }
       }
 
-      // Process orders data
-      let totalOrders = 0;
-      let totalRevenue = 0;
-      let recentOrders = [];
       if (ordersRes.status === 'fulfilled' && ordersRes.value.ok) {
         const ordersData = await ordersRes.value.json();
         if (ordersData.success) {
@@ -123,21 +101,9 @@ const AdminDashboard = () => {
         }
       }
 
-      setDashboardData({
-        totalUsers,
-        totalGames,
-        totalOrders,
-        totalRevenue,
-        recentUsers,
-        recentOrders,
-        games
-      });
-
+      setDashboardData({ totalUsers, totalGames, totalOrders, totalRevenue, recentUsers, recentOrders, games });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      setError('Failed to load dashboard data');
-      
-      // Fallback to static data if API fails
       setDashboardData({
         totalUsers: 156,
         totalGames: 24,
@@ -145,18 +111,15 @@ const AdminDashboard = () => {
         totalRevenue: 12450,
         recentUsers: [
           { id: 1, name: 'John Doe', email: 'john@example.com', joinDate: '2024-01-15', status: 'Active' },
-          { id: 2, name: 'Jane Smith', email: 'jane@example.com', joinDate: '2024-01-14', status: 'Active' },
-          { id: 3, name: 'Mike Johnson', email: 'mike@example.com', joinDate: '2024-01-13', status: 'Inactive' }
+          { id: 2, name: 'Jane Smith', email: 'jane@example.com', joinDate: '2024-01-14', status: 'Active' }
         ],
         recentOrders: [
           { id: 1, customerName: 'Alice Brown', amount: 29.99, status: 'Completed', date: '2024-01-15' },
-          { id: 2, customerName: 'Bob Wilson', amount: 19.99, status: 'Processing', date: '2024-01-14' },
-          { id: 3, customerName: 'Carol Davis', amount: 39.99, status: 'Completed', date: '2024-01-13' }
+          { id: 2, customerName: 'Bob Wilson', amount: 19.99, status: 'Processing', date: '2024-01-14' }
         ],
         games: [
           { id: 1, title: 'Cyber Quest', image: '/api/placeholder/300/400', price: '$29.99', downloads: 1250, rating: 4.8, status: 'Active' },
-          { id: 2, title: 'Space Warriors', image: '/api/placeholder/300/400', price: '$19.99', downloads: 890, rating: 4.6, status: 'Active' },
-          { id: 3, title: 'Fantasy Realm', image: '/api/placeholder/300/400', price: '$39.99', downloads: 2100, rating: 4.9, status: 'Active' }
+          { id: 2, title: 'Space Warriors', image: '/api/placeholder/300/400', price: '$19.99', downloads: 890, rating: 4.6, status: 'Active' }
         ]
       });
     } finally {
@@ -168,19 +131,11 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-      
       const response = await fetch(`${baseURL}/api/users/${userId}/${action}`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
       });
-
-      if (response.ok) {
-        // Refresh data after action
-        fetchDashboardData();
-      }
+      if (response.ok) fetchDashboardData();
     } catch (error) {
       console.error(`Error performing ${action} on user:`, error);
     }
@@ -190,19 +145,11 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-      
-      const response = await fetch(`${baseURL}/api/games/${gameId}/${action}`, {
+      const response = await fetch(`${baseURL}/games/${gameId}/${action}`, {
         method: action === 'delete' ? 'DELETE' : 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
       });
-
-      if (response.ok) {
-        // Refresh data after action
-        fetchDashboardData();
-      }
+      if (response.ok) fetchDashboardData();
     } catch (error) {
       console.error(`Error performing ${action} on game:`, error);
     }
@@ -216,99 +163,41 @@ const AdminDashboard = () => {
     { id: 'settings', label: 'Settings', icon: FaCog }
   ];
 
-  const StatCard = ({ icon: Icon, title, value, change, color }) => (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      className="bg-gray-800 rounded-xl p-6 border border-gray-700"
-    >
+  const StatCard = ({ icon: Icon, title, value, color }) => (
+    <motion.div whileHover={{ scale: 1.02 }} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-gray-400 text-sm font-medium">{title}</p>
-          <p className="text-2xl font-bold text-white mt-1">{value}</p>
-          {change && (
-            <p className={`text-sm mt-1 ${change > 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {change > 0 ? '+' : ''}{change}% from last month
-            </p>
-          )}
+          <p className="text-gray-400 text-xs font-medium">{title}</p>
+          <p className="text-lg font-bold text-white mt-1">{value}</p>
         </div>
-        <div className={`p-3 rounded-lg bg-${color}-500/20`}>
-          <Icon className={`text-${color}-400 text-xl`} />
+        <div className={`p-2 rounded bg-${color}-500/20`}>
+          <Icon className={`text-${color}-400 text-lg`} />
         </div>
       </div>
     </motion.div>
   );
 
   const renderOverview = () => (
-    <div className="space-y-6">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <StatCard
-          icon={FaUsers}
-          title="Total Users"
-          value={dashboardData.totalUsers.toLocaleString()}
-          change={12.5}
-          color="blue"
-        />
-        <StatCard
-          icon={FaGamepad}
-          title="Total Games"
-          value={dashboardData.totalGames}
-          change={8.3}
-          color="purple"
-        />
-        <StatCard
-          icon={FaDollarSign}
-          title="Total Revenue"
-          value={`₹${dashboardData.totalRevenue.toLocaleString()}`}
-          change={15.7}
-          color="green"
-        />
-        <StatCard
-          icon={FaShoppingCart}
-          title="Total Orders"
-          value={dashboardData.totalOrders.toLocaleString()}
-          change={9.2}
-          color="orange"
-        />
-        <StatCard
-          icon={FaUsers}
-          title="Active Users"
-          value={dashboardData.recentUsers.filter(user => user.status === 'Active').length}
-          change={-2.1}
-          color="cyan"
-        />
-        <StatCard
-          icon={FaExclamationTriangle}
-          title="Pending Orders"
-          value={dashboardData.recentOrders.filter(order => order.status === 'Pending').length}
-          change={-18.5}
-          color="red"
-        />
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard icon={FaUsers} title="Total Users" value={dashboardData.totalUsers.toLocaleString()} color="blue" />
+        <StatCard icon={FaGamepad} title="Total Games" value={dashboardData.totalGames} color="purple" />
+        <StatCard icon={FaDollarSign} title="Total Revenue" value={`₹${dashboardData.totalRevenue.toLocaleString()}`} color="green" />
+        <StatCard icon={FaShoppingCart} title="Total Orders" value={dashboardData.totalOrders.toLocaleString()} color="orange" />
       </div>
-
-      {/* Recent Activity */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-white">Recent Activity</h3>
-          <FaBell className="text-gray-400" />
-        </div>
-        <div className="space-y-3">
-          {dashboardData.recentUsers.map((user) => (
-            <div key={user.id} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
+      <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <h3 className="text-lg font-bold text-white mb-3">Recent Activity</h3>
+        <div className="space-y-2">
+          {dashboardData.recentUsers.map(user => (
+            <div key={user.id} className="flex items-center gap-2 p-2 bg-gray-700/50 rounded">
               <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
-              <div className="flex-1">
-                <p className="text-white text-sm">{user.name} joined</p>
-                <p className="text-gray-400 text-xs">{user.joinDate}</p>
-              </div>
+              <p className="text-white text-sm">{user.name} joined - <span className="text-gray-400">{user.joinDate}</span></p>
             </div>
           ))}
-          {dashboardData.recentOrders.map((order) => (
-            <div key={order.id} className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
+          {dashboardData.recentOrders.map(order => (
+            <div key={order.id} className="flex items-center gap-2 p-2 bg-gray-700/50 rounded">
               <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-              <div className="flex-1">
-                <p className="text-white text-sm">{order.customerName} placed an order</p>
-                <p className="text-gray-400 text-xs">{order.date}</p>
-              </div>
+              <p className="text-white text-sm">{order.customerName} ordered - <span className="text-gray-400">{order.date}</span></p>
             </div>
           ))}
         </div>
@@ -317,131 +206,70 @@ const AdminDashboard = () => {
   );
 
   const renderUsers = () => (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-white">User Management</h3>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-        >
-          <FaUserPlus />
-          Add User
+        <h3 className="text-lg font-bold text-white">Users</h3>
+        <motion.button whileHover={{ scale: 1.05 }} className="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1 rounded flex items-center gap-1 text-sm">
+          <FaUserPlus /> Add User
         </motion.button>
       </div>
-
-      <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-700">
-              <tr>
-                <th className="text-left p-4 text-gray-300 font-semibold">Name</th>
-                <th className="text-left p-4 text-gray-300 font-semibold">Email</th>
-                <th className="text-left p-4 text-gray-300 font-semibold">Status</th>
-                <th className="text-left p-4 text-gray-300 font-semibold">Join Date</th>
-                <th className="text-left p-4 text-gray-300 font-semibold">Actions</th>
+      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-700">
+            <tr>
+              <th className="text-left p-3 text-gray-300">Name</th>
+              <th className="text-left p-3 text-gray-300">Email</th>
+              <th className="text-left p-3 text-gray-300">Status</th>
+              <th className="text-left p-3 text-gray-300">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dashboardData.recentUsers.map(user => (
+              <tr key={user.id} className="border-b border-gray-700 hover:bg-gray-700/50">
+                <td className="p-3 text-white">{user.name}</td>
+                <td className="p-3 text-gray-300">{user.email}</td>
+                <td className="p-3">
+                  <span className={`px-2 py-1 rounded-full text-xs ${user.status === 'Active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                    {user.status}
+                  </span>
+                </td>
+                <td className="p-3 flex gap-2">
+                  <motion.button whileHover={{ scale: 1.1 }} className="text-blue-400"><FaEye /></motion.button>
+                  <motion.button whileHover={{ scale: 1.1 }} className="text-yellow-400"><FaEdit /></motion.button>
+                  <motion.button whileHover={{ scale: 1.1 }} className="text-red-400"><FaTrash /></motion.button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {dashboardData.recentUsers.map((user) => (
-                <tr key={user.id} className="border-b border-gray-700 hover:bg-gray-700/50">
-                  <td className="p-4 text-white">{user.name}</td>
-                  <td className="p-4 text-gray-300">{user.email}</td>
-                  <td className="p-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      user.status === 'Active' 
-                        ? 'bg-green-500/20 text-green-400' 
-                        : 'bg-red-500/20 text-red-400'
-                    }`}>
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-gray-300">{user.joinDate}</td>
-                  <td className="p-4">
-                    <div className="flex gap-2">
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        className="text-blue-400 hover:text-blue-300"
-                      >
-                        <FaEye />
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        className="text-yellow-400 hover:text-yellow-300"
-                      >
-                        <FaEdit />
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        className="text-red-400 hover:text-red-300"
-                      >
-                        <FaTrash />
-                      </motion.button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 
   const renderGames = () => (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-white">Game Management</h3>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-        >
-          <FaGamepad />
-          Add Game
+        <h3 className="text-lg font-bold text-white">Games</h3>
+        <motion.button whileHover={{ scale: 1.05 }} className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded flex items-center gap-1 text-sm">
+          <FaGamepad /> Add Game
         </motion.button>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {dashboardData.games.map((game) => (
-          <motion.div
-            key={game.id}
-            whileHover={{ scale: 1.02 }}
-            className="bg-gray-800 rounded-xl p-6 border border-gray-700"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-bold text-white">{game.title}</h4>
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                game.status === 'Active' 
-                  ? 'bg-green-500/20 text-green-400' 
-                  : 'bg-red-500/20 text-red-400'
-              }`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {dashboardData.games.map(game => (
+          <motion.div key={game.id} whileHover={{ scale: 1.02 }} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-base font-bold text-white">{game.title}</h4>
+              <span className={`px-2 py-1 rounded-full text-xs ${game.status === 'Active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                 {game.status}
               </span>
             </div>
-            <div className="space-y-2 mb-4">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Downloads:</span>
-                <span className="text-white font-semibold">{game.downloads}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Rating:</span>
-                <span className="text-green-400 font-semibold">{game.rating}</span>
-              </div>
+            <div className="space-y-1 text-sm">
+              <div className="flex justify-between"><span className="text-gray-400">Downloads:</span><span className="text-white">{game.downloads}</span></div>
+              <div className="flex justify-between"><span className="text-gray-400">Rating:</span><span className="text-green-400">{game.rating}</span></div>
             </div>
-            <div className="flex gap-2">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm"
-              >
-                View Details
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg text-sm"
-              >
-                Edit
-              </motion.button>
+            <div className="flex gap-2 mt-3">
+              <motion.button whileHover={{ scale: 1.05 }} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-1 rounded text-sm">View</motion.button>
+              <motion.button whileHover={{ scale: 1.05 }} className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-1 rounded text-sm">Edit</motion.button>
             </div>
           </motion.div>
         ))}
@@ -450,76 +278,52 @@ const AdminDashboard = () => {
   );
 
   const renderOrders = () => (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-white">Order Management</h3>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-        >
-          <FaDownload />
-          Export Orders
+        <h3 className="text-lg font-bold text-white">Orders</h3>
+        <motion.button whileHover={{ scale: 1.05 }} className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded flex items-center gap-1 text-sm">
+          <FaDownload /> Export
         </motion.button>
       </div>
-
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-        <div className="text-center py-12">
-          <FaShoppingCart className="text-6xl text-gray-600 mx-auto mb-4" />
-          <h4 className="text-xl font-bold text-white mb-2">Order Management</h4>
-          <p className="text-gray-400">Order management functionality will be implemented here.</p>
-          <p className="text-gray-400 text-sm mt-2">Track orders, manage refunds, and view order analytics.</p>
-        </div>
+      <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-center py-8">
+        <FaShoppingCart className="text-4xl text-gray-600 mx-auto mb-3" />
+        <h4 className="text-base font-bold text-white mb-1">Order Management</h4>
+        <p className="text-gray-400 text-sm">Track orders, manage refunds, and view analytics.</p>
       </div>
     </div>
   );
 
   const renderSettings = () => (
-    <div className="space-y-6">
-      <h3 className="text-xl font-bold text-white">System Settings</h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h4 className="text-lg font-bold text-white mb-4">General Settings</h4>
-          <div className="space-y-4">
+    <div className="space-y-4">
+      <h3 className="text-lg font-bold text-white">Settings</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <h4 className="text-base font-bold text-white mb-3">General</h4>
+          <div className="space-y-3">
             <div>
-              <label className="block text-gray-300 text-sm mb-2">Site Name</label>
-              <input
-                type="text"
-                defaultValue="ClutchCoins"
-                className="w-full p-3 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
-              />
+              <label className="block text-gray-300 text-sm mb-1">Site Name</label>
+              <input type="text" defaultValue="ClutchCoins" className="w-full p-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500" />
             </div>
             <div>
-              <label className="block text-gray-300 text-sm mb-2">Site Description</label>
-              <textarea
-                defaultValue="Instant Recharge. Instant Victory!"
-                className="w-full p-3 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 h-20"
-              />
+              <label className="block text-gray-300 text-sm mb-1">Description</label>
+              <textarea defaultValue="Instant Recharge. Instant Victory!" className="w-full p-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 h-16" />
             </div>
           </div>
         </div>
-
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h4 className="text-lg font-bold text-white mb-4">Payment Settings</h4>
-          <div className="space-y-4">
+        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <h4 className="text-base font-bold text-white mb-3">Payments</h4>
+          <div className="space-y-3 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-gray-300">UPI Payments</span>
-              <div className="w-12 h-6 bg-green-600 rounded-full relative">
-                <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5"></div>
-              </div>
+              <div className="w-10 h-5 bg-green-600 rounded-full relative"><div className="w-4 h-4 bg-white rounded-full absolute top-0.5 right-0.5"></div></div>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-300">Card Payments</span>
-              <div className="w-12 h-6 bg-green-600 rounded-full relative">
-                <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5"></div>
-              </div>
+              <div className="w-10 h-5 bg-green-600 rounded-full relative"><div className="w-4 h-4 bg-white rounded-full absolute top-0.5 right-0.5"></div></div>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-300">Net Banking</span>
-              <div className="w-12 h-6 bg-gray-600 rounded-full relative">
-                <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5"></div>
-              </div>
+              <div className="w-10 h-5 bg-gray-600 rounded-full relative"><div className="w-4 h-4 bg-white rounded-full absolute top-0.5 left-0.5"></div></div>
             </div>
           </div>
         </div>
@@ -527,77 +331,39 @@ const AdminDashboard = () => {
     </div>
   );
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'overview':
-        return renderOverview();
-      case 'users':
-        return renderUsers();
-      case 'games':
-        return renderGames();
-      case 'orders':
-        return renderOrders();
-      case 'settings':
-        return renderSettings();
-      default:
-        return renderOverview();
-    }
-  };
-
   return (
     <>
       <Helmet>
         <title>Admin Dashboard - ClutchCoins</title>
-        <meta name="description" content="ClutchCoins admin dashboard for managing users, games, orders, and system settings" />
+        <meta name="description" content="ClutchCoins admin dashboard for managing users, games, and orders" />
       </Helmet>
-
-      <div className="min-h-screen bg-gray-900 pt-24 pb-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-3xl font-bold text-white mb-2"
-            >
-              Admin Dashboard
-            </motion.h1>
-            <p className="text-gray-400">Manage your ClutchCoins platform</p>
+      <div className="mt-20 pl-30 min-h-screen bg-gray-900 flex">
+        <main className="flex-1 pt-16 pb-6 px-4 sm:px-6 lg:pr-8 max-w-2xl mx-auto">
+          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-2xl font-bold text-white mb-2">
+            Admin Dashboard
+          </motion.h1>
+          <p className="text-gray-400 text-sm mb-4">Manage your ClutchCoins platform</p>
+          <div className="mb-4 flex space-x-1 bg-gray-800 p-1 rounded-lg border border-gray-700 overflow-x-auto">
+            {tabs.map(tab => (
+              <motion.button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                whileHover={{ scale: 1.02 }}
+                className={`flex items-center gap-1 px-3 py-1 rounded font-medium text-sm ${activeTab === tab.id ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-700'}`}
+              >
+                <tab.icon className="text-sm" /> {tab.label}
+              </motion.button>
+            ))}
           </div>
-
-          {/* Navigation Tabs */}
-          <div className="mb-8">
-            <div className="flex space-x-1 bg-gray-800 p-1 rounded-xl border border-gray-700 overflow-x-auto">
-              {tabs.map((tab) => (
-                <motion.button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? 'bg-cyan-600 text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                  }`}
-                >
-                  <tab.icon className="text-sm" />
-                  {tab.label}
-                </motion.button>
-              ))}
-            </div>
-          </div>
-
-          {/* Content */}
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Sidebar />
-            {renderContent()}
+          <motion.div key={activeTab} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+            {activeTab === 'overview' && renderOverview()}
+            {activeTab === 'users' && renderUsers()}
+            {activeTab === 'games' && renderGames()}
+            {activeTab === 'orders' && renderOrders()}
+            {activeTab === 'settings' && renderSettings()}
           </motion.div>
-        </div>
+        </main>
+        <Sidebar className="fixed right-0 top-0 h-screen z-40 hidden lg:block" />
       </div>
     </>
   );

@@ -7,7 +7,6 @@ const session = require("express-session"); // Added express-session
 const http = require("http");
 const { Server } = require("socket.io");
 require("dotenv").config();
-
 const connectDB = require("./config/db");
 const blogRoutes = require('./routes/blogRoutses');
 const adminRoutes = require('./routes/adminRouts');
@@ -18,6 +17,7 @@ const uploadRoutes = require("./routes/uploadRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const errorHandler = require("./middleware/errorHandler");
+const heroTrendingRoutes = require("./routes/heroTrendingRoutes");
 
 require("./config/passport");
 
@@ -65,7 +65,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/packages", packageRoutes);
-
+app.use("/api/featured", heroTrendingRoutes);
 // Error handler
 app.use(errorHandler);
 

@@ -157,9 +157,9 @@ function Header() {
   return (
     <>
       <nav className="bg-gradient-to-b from-blue-900 to-slate-950 p-2 fixed w-full top-0 z-50 shadow-md">
-        <div className="max-w-6xl mx-auto flex flex-col gap-1">
+        <div className="max-w-5xl mx-auto flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <div className="flex flex-col">
+            <div className="flex flex-col left-0">
               <Link to="/" className="text-xl font-bold text-white hover:text-cyan-300">
                 Clutch <span className="text-cyan-500">Coins</span>
               </Link>

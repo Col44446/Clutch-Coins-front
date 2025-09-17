@@ -3,9 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
-import { 
-  FaGlobe, FaBolt, FaShieldAlt, FaDollarSign, FaShoppingCart, 
-  FaChevronDown, FaChevronUp, FaCheckCircle, FaExclamationTriangle, FaTimes 
+import {
+  FaGlobe, FaBolt, FaShieldAlt, FaDollarSign, FaShoppingCart,
+  FaChevronDown, FaChevronUp, FaCheckCircle, FaExclamationTriangle, FaTimes
 } from 'react-icons/fa';
 
 const GameDetails = memo(() => {
@@ -21,7 +21,7 @@ const GameDetails = memo(() => {
   const [popup, setPopup] = useState({ show: false, type: '', title: '', message: '' });
   const [addingToCart, setAddingToCart] = useState(false);
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
   const toggleOffers = useCallback(() => setShowFullOffers(!showFullOffers), [showFullOffers]);
 
@@ -79,7 +79,7 @@ const GameDetails = memo(() => {
     }
     setAddingToCart(true);
     try {
-      const response = await axios.post('/api/cart/add', {
+      const response = await axios.post(`${API_BASE_URL}/cart/add`, {
         gameId: game._id || id,
         gameName: game.title,
         gamePageName: game.title,
@@ -98,7 +98,6 @@ const GameDetails = memo(() => {
         showPopup('success', 'Cart Updated', `${quantity} item(s) added to cart!`);
         setQuantity(1);
         setSelectedCurrency(null);
-        // Trigger cart update event for header
         window.dispatchEvent(new CustomEvent('cartUpdated', { 
           detail: { itemCount: response.data.data.items.length } 
         }));
@@ -111,7 +110,7 @@ const GameDetails = memo(() => {
     } finally {
       setAddingToCart(false);
     }
-  }, [selectedCurrency, game, quantity, id, showPopup, userId]);
+  }, [selectedCurrency, game, quantity, id, showPopup, userId, API_BASE_URL]);
 
   useEffect(() => {
     const fetchGame = async () => {
@@ -157,7 +156,7 @@ const GameDetails = memo(() => {
       <div className="flex flex-col justify-center items-center h-screen bg-gray-900 p-3 text-center">
         <h2 className="text-red-500 text-lg font-semibold mb-3">Game Not Found</h2>
         <p className="text-gray-300 text-sm mb-4">We couldn't find the game you're looking for.</p>
-        <button 
+        <button
           onClick={() => navigate('/')}
           className="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-1.5 px-4 rounded-md text-sm transition-colors"
         >
@@ -296,7 +295,7 @@ const GameDetails = memo(() => {
                       className="overflow-hidden"
                     >
                       <p className="text-xs text-gray-300">
-                        {game.offers.length > 0 
+                        {game.offers.length > 0
                           ? `${game.offers[0].key}: ${game.offers[0].value}...`
                           : 'No offers available'}
                       </p>
@@ -340,11 +339,10 @@ const GameDetails = memo(() => {
                       onClick={() => handleCurrencySelect(curr)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`p-3 rounded-md border ${
-                        selectedCurrency?.name === curr.name 
-                          ? 'bg-cyan-600 border-cyan-400 shadow-md' 
+                      className={`p-3 rounded-md border ${selectedCurrency?.name === curr.name
+                          ? 'bg-cyan-600 border-cyan-400 shadow-md'
                           : 'bg-gray-700 border-gray-600 hover:border-cyan-500'
-                      }`}
+                        }`}
                     >
                       {selectedCurrency?.name === curr.name && (
                         <div className="absolute top-1 right-1">
@@ -449,7 +447,7 @@ const GameDetails = memo(() => {
                     whileTap={{ scale: 0.98 }}
                     className="w-full py-1 bg-orange-600 hover:bg-orange-500 disabled:bg-gray-600 text-white font-semibold rounded flex items-center justify-center gap-1 text-xs"
                   >
-                    <FaShoppingCart className="text-sm" /> 
+                    <FaShoppingCart className="text-sm" />
                     {addingToCart ? 'Adding...' : 'Add to Cart'}
                   </motion.button>
                 </div>
@@ -467,11 +465,10 @@ const GameDetails = memo(() => {
                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 className="fixed bottom-3 left-3 right-3 max-w-xs mx-auto z-50"
               >
-                <div className={`rounded-md p-3 shadow-md border-l-4 ${
-                  popup.type === 'success' 
-                    ? 'bg-green-900 border-green-500 text-green-100' 
+                <div className={`rounded-md p-3 shadow-md border-l-4 ${popup.type === 'success'
+                    ? 'bg-green-900 border-green-500 text-green-100'
                     : 'bg-red-900 border-red-500 text-red-100'
-                }`}>
+                  }`}>
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-2">
                       {popup.type === 'success' ? (

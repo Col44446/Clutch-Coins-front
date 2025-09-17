@@ -9,7 +9,6 @@ function AddGame({ isEdit = false }) {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const { id } = useParams();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [title, setTitle] = useState('');
   const [publisher, setPublisher] = useState('');
   const [description, setDescription] = useState('');
@@ -27,13 +26,6 @@ function AddGame({ isEdit = false }) {
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
-  console.log('API_BASE_URL:', API_BASE_URL);
-  console.log('Token:', token);
-
-  // Add toggleSidebar function
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
-  // Image change handler
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -50,23 +42,20 @@ function AddGame({ isEdit = false }) {
     }
   };
 
-  // Add offer handler
   const handleAddOffer = () => {
     if (!offerKey.trim() || !offerValue.trim()) {
       setError('Offer key and value cannot be empty');
       return;
     }
-    setOffersList((prev) => [...prev, { key: offerKey.trim(), value: offerValue.trim() }]);
+    setOffersList(prev => [...prev, { key: offerKey.trim(), value: offerValue.trim() }]);
     setOfferKey('');
     setOfferValue('');
   };
 
-  // Remove offer handler
   const handleRemoveOffer = (index) => {
-    setOffersList((prev) => prev.filter((_, i) => i !== index));
+    setOffersList(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Add currency handler
   const handleAddCurrency = () => {
     if (!currencyName.trim() || !currencyAmount.trim()) {
       setError('Currency name and amount cannot be empty');
@@ -76,17 +65,13 @@ function AddGame({ isEdit = false }) {
       setError('Currency amount must be a valid positive number');
       return;
     }
-    setCurrenciesList((prev) => [
-      ...prev,
-      { name: currencyName.trim(), amount: Number(currencyAmount) },
-    ]);
+    setCurrenciesList(prev => [...prev, { name: currencyName.trim(), amount: Number(currencyAmount) }]);
     setCurrencyName('');
     setCurrencyAmount('');
   };
 
-  // Remove currency handler
   const handleRemoveCurrency = (index) => {
-    setCurrenciesList((prev) => prev.filter((_, i) => i !== index));
+    setCurrenciesList(prev => prev.filter((_, i) => i !== index));
   };
 
   useEffect(() => {
@@ -105,7 +90,6 @@ function AddGame({ isEdit = false }) {
           setCurrenciesList(game.currencies || []);
           setPreview(game.image ? `${API_BASE_URL}/../${game.image}` : null);
         } catch (err) {
-          console.error('Fetch game error:', err);
           setError(err.response?.data?.message || 'Failed to fetch game data');
         } finally {
           setLoading(false);
@@ -133,18 +117,11 @@ function AddGame({ isEdit = false }) {
     formData.append('description', description.trim());
     formData.append('offers', JSON.stringify(offersList));
     formData.append('currencies', JSON.stringify(currenciesList));
-    if (image) {
-      formData.append('image', image);
-    }
-
-    for (const [key, value] of formData.entries()) {
-      // FormData validation could be added here if needed
-    }
+    if (image) formData.append('image', image);
 
     try {
       const url = isEdit ? `${API_BASE_URL}/games/${id}` : `${API_BASE_URL}/games`;
       const method = isEdit ? 'put' : 'post';
-
       const response = await axios({
         method,
         url,
@@ -163,20 +140,13 @@ function AddGame({ isEdit = false }) {
         setError(response.data.message || `Failed to ${isEdit ? 'update' : 'create'} game`);
       }
     } catch (err) {
-      console.error('API error:', err);
-      setError(
-        err.response?.data?.message ||
-        err.message ||
-        `Failed to ${isEdit ? 'update' : 'create'} game`
-      );
+      setError(err.response?.data?.message || `Failed to ${isEdit ? 'update' : 'create'} game`);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!token) return <Navigate to="/login" replace />;
 
   return (
     <>
@@ -185,215 +155,155 @@ function AddGame({ isEdit = false }) {
         <meta name="description" content={`${isEdit ? 'Edit' : 'Create'} a game in the Game Zone admin panel.`} />
         <meta name="robots" content="noindex" />
       </Helmet>
-      <div className="flex h-screen">
-        <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        <main
-          className={`flex-1 mt-36 p-4 md:p-8 overflow-y-auto transition-all duration-300 ${
-            isSidebarOpen ? 'ml-64' : 'ml-16'
-          }`}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-3xl mx-auto"
-          >
-            <h1 className="text-4xl font-bold text-white mb-6">
-              {isEdit ? 'Edit' : 'Add New'} Game <span className="text-cyan-500">Entry</span>
+      <div className="min-h-screen bg-gray-900 flex">
+        <main className="flex-1 pt-28 pb-6 px-4 sm:px-6 lg:pr-8 max-w-2xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <h1 className="text-2xl font-bold text-white mb-4">
+              {isEdit ? 'Edit' : 'Add'} Game <span className="text-cyan-500">Entry</span>
             </h1>
             {error && (
-              <div className="bg-red-500 text-white p-3 mb-4 rounded-lg" role="alert">
+              <div className="bg-red-500/20 text-red-300 p-2 mb-3 rounded" role="alert">
                 {error}
               </div>
             )}
             {success && (
-              <div className="bg-green-500 text-white p-3 mb-4 rounded-lg" role="alert">
+              <div className="bg-green-500/20 text-green-300 p-2 mb-3 rounded" role="alert">
                 Game {isEdit ? 'updated' : 'created'} successfully! Redirecting...
               </div>
             )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Title */}
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-white text-lg font-medium mb-2">Title</label>
+                <label className="block text-white text-sm font-medium mb-1">Title</label>
                 <input
                   id="game-title"
-                  name="title"
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  className="w-full p-2 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
                   placeholder="Enter game title"
                   required
                 />
               </div>
-
-              {/* Publisher */}
               <div>
-                <label className="block text-white text-lg font-medium mb-2">Publisher</label>
+                <label className="block text-white text-sm font-medium mb-1">Publisher</label>
                 <input
                   id="game-publisher"
-                  name="publisher"
                   type="text"
                   value={publisher}
                   onChange={(e) => setPublisher(e.target.value)}
-                  className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  className="w-full p-2 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
                   placeholder="Enter publisher name"
                   required
                 />
               </div>
-
-              {/* Description */}
               <div>
-                <label className="block text-white text-lg font-medium mb-2">Description</label>
+                <label className="block text-white text-sm font-medium mb-1">Description</label>
                 <textarea
                   id="game-description"
-                  name="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 h-40 resize-y"
+                  className="w-full p-2 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 h-24 resize-y text-sm"
                   placeholder="Enter game description"
                   required
                 />
               </div>
-
-              {/* Offers */}
               <div>
-                <label className="block text-white text-lg font-medium mb-2">
-                  Offers <span className="text-gray-400 text-sm">(optional)</span>
-                </label>
+                <label className="block text-white text-sm font-medium mb-1">Offers (optional)</label>
                 <div className="flex gap-2 mb-2">
                   <input
                     id="offer-key"
-                    name="offerKey"
                     type="text"
                     placeholder="Offer Key (e.g. discount)"
                     value={offerKey}
                     onChange={(e) => setOfferKey(e.target.value)}
-                    className="flex-1 p-2 bg-gray-800 text-white rounded"
+                    className="flex-1 p-2 bg-gray-800 text-white rounded text-sm"
                   />
                   <input
                     id="offer-value"
-                    name="offerValue"
                     type="text"
                     placeholder="Offer Value (e.g. 10%)"
                     value={offerValue}
                     onChange={(e) => setOfferValue(e.target.value)}
-                    className="flex-1 p-2 bg-gray-800 text-white rounded"
+                    className="flex-1 p-2 bg-gray-800 text-white rounded text-sm"
                   />
                   <button
                     type="button"
                     onClick={handleAddOffer}
-                    className="bg-cyan-500 px-4 py-2 rounded text-white"
+                    className="bg-cyan-600 hover:bg-cyan-700 px-3 py-1 rounded text-white text-sm"
                   >
                     Add
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {offersList.map((offer, index) => (
-                    <span
-                      key={index}
-                      className="bg-cyan-600 text-white px-3 py-1 rounded-full flex items-center gap-2"
-                    >
+                    <span key={index} className="bg-cyan-600/50 text-white px-2 py-1 rounded-full flex items-center gap-1 text-xs">
                       {offer.key}: {offer.value}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveOffer(index)}
-                        className="text-red-300 hover:text-red-500"
-                      >
-                        ×
-                      </button>
+                      <button type="button" onClick={() => handleRemoveOffer(index)} className="text-red-300 hover:text-red-500">×</button>
                     </span>
                   ))}
                 </div>
               </div>
-
-              {/* Currencies */}
               <div>
-                <label className="block text-white text-lg font-medium mb-2">
-                  Currencies <span className="text-gray-400 text-sm">(optional)</span>
-                </label>
+                <label className="block text-white text-sm font-medium mb-1">Currencies (optional)</label>
                 <div className="flex gap-2 mb-2">
                   <input
                     id="currency-name"
-                    name="currencyName"
                     type="text"
                     placeholder="Currency Name (e.g. USD)"
                     value={currencyName}
                     onChange={(e) => setCurrencyName(e.target.value)}
-                    className="flex-1 p-2 bg-gray-800 text-white rounded"
+                    className="flex-1 p-2 bg-gray-800 text-white rounded text-sm"
                   />
                   <input
                     id="currency-amount"
-                    name="currencyAmount"
                     type="number"
                     placeholder="Amount"
                     value={currencyAmount}
                     onChange={(e) => setCurrencyAmount(e.target.value)}
-                    className="flex-1 p-2 bg-gray-800 text-white rounded"
+                    className="flex-1 p-2 bg-gray-800 text-white rounded text-sm"
                     min="0"
                     step="0.01"
                   />
                   <button
                     type="button"
                     onClick={handleAddCurrency}
-                    className="bg-cyan-500 px-4 py-2 rounded text-white"
+                    className="bg-cyan-600 hover:bg-cyan-700 px-3 py-1 rounded text-white text-sm"
                   >
                     Add
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {currenciesList.map((curr, index) => (
-                    <span
-                      key={index}
-                      className="bg-cyan-600 text-white px-3 py-1 rounded-full flex items-center gap-2"
-                    >
+                    <span key={index} className="bg-cyan-600/50 text-white px-2 py-1 rounded-full flex items-center gap-1 text-xs">
                       {curr.name}: {curr.amount}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveCurrency(index)}
-                        className="text-red-300 hover:text-red-500"
-                      >
-                        ×
-                      </button>
+                      <button type="button" onClick={() => handleRemoveCurrency(index)} className="text-red-300 hover:text-red-500">×</button>
                     </span>
                   ))}
                 </div>
               </div>
-
-              {/* Image */}
               <div>
-                <label className="block text-white text-lg font-medium mb-2">
-                  Image <span className="text-gray-400 text-sm">(optional)</span>
-                </label>
+                <label className="block text-white text-sm font-medium mb-1">Image (optional)</label>
                 <input
                   id="game-image"
-                  name="image"
                   type="file"
                   onChange={handleImageChange}
-                  className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  className="w-full p-2 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
                   accept="image/*"
                 />
-                {preview && (
-                  <div className="mt-4">
-                    <img src={preview} alt="Game preview" className="w-32 h-32 object-cover rounded-lg" />
-                  </div>
-                )}
+                {preview && <img src={preview} alt="Game preview" className="mt-2 w-24 h-24 object-cover rounded" />}
               </div>
-
-              {/* Submit Button */}
               <motion.button
                 type="submit"
                 disabled={loading}
                 whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-lg disabled:opacity-50"
+                className="w-full py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded text-sm disabled:opacity-50"
               >
                 {loading ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update Game' : 'Create Game')}
               </motion.button>
             </form>
           </motion.div>
         </main>
+        <Sidebar className="fixed right-0 top-0 h-screen z-40 hidden lg:block" />
       </div>
     </>
   );

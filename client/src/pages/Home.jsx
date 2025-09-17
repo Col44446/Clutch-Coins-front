@@ -11,7 +11,6 @@ export const Home = () => {
   return (
     <div className="min-h-screen pt-3   ">
       <MainCard />
-      <Offers />
       <PopularGames />
       <section
         className="bg-gray-800 py-6 px-4"

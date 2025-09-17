@@ -7,9 +7,7 @@ import Sidebar from './sidebar';
 
 function CreateBlogWithSidebar() {
   const token = localStorage.getItem("token");
-  if (!token) return <Navigate to="/login" replace />; // 🔹 Token guard
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [image, setImage] = useState(null);
@@ -17,16 +15,23 @@ function CreateBlogWithSidebar() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const navigate = useNavigate();
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setImage(file);
-    setPreview(URL.createObjectURL(file));
+    if (file) {
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        setError('Only JPEG or PNG images are allowed');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image size must be less than 5MB');
+        return;
+      }
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -35,17 +40,24 @@ function CreateBlogWithSidebar() {
     setError(null);
     setSuccess(false);
 
+    if (!title.trim() || !content.trim()) {
+      setError('Title and content are required');
+      setLoading(false);
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('title', title);
-    formData.append('content', content);
+    formData.append('title', title.trim());
+    formData.append('content', content.trim());
     if (image) formData.append('image', image);
 
     try {
       const response = await axios.post(`${API_BASE_URL}/admin/blog`, formData, {
         headers: {
-          Authorization: `Bearer ${token}`, // 🔹 Token send
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
+        timeout: 10000,
       });
 
       if (response.data.success) {
@@ -55,12 +67,13 @@ function CreateBlogWithSidebar() {
         setError(response.data.error || 'Failed to create blog');
       }
     } catch (err) {
-      console.error('❌ API Error:', err);
       setError(err.response?.data?.error || 'Failed to create blog');
     } finally {
       setLoading(false);
     }
   };
+
+  if (!token) return <Navigate to="/login" replace />;
 
   return (
     <>
@@ -69,76 +82,64 @@ function CreateBlogWithSidebar() {
         <meta name="description" content="Create a new blog post for Game Zone admin panel." />
         <meta name="robots" content="noindex" />
       </Helmet>
-      <div className="flex h-screen">
-        <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        <main
-          className={`flex-1 mt-36 p-4 md:p-8 overflow-y-auto transition-all duration-300 ${
-            isSidebarOpen ? 'ml-64' : 'ml-16'
-          }`}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-3xl mx-auto"
-          >
-            <h1 className="text-4xl font-bold text-white mb-6">
-              Create New Blog <span className="text-cyan-500">Post</span>
+      <div className="min-h-screen bg-gray-900 flex">
+        <main className="flex-1 pt-28 pb-6 px-4 sm:px-6 lg:pr-8 max-w-2xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <h1 className="text-2xl font-bold text-white mb-4">
+              Create Blog <span className="text-cyan-500">Post</span>
             </h1>
             {error && (
-              <div className="bg-red-500 text-white p-3 mb-4 rounded-lg" role="alert">
+              <div className="bg-red-500/20 text-red-300 p-2 mb-3 rounded" role="alert">
                 {error}
               </div>
             )}
             {success && (
-              <div className="bg-green-500 text-white p-3 mb-4 rounded-lg" role="alert">
+              <div className="bg-green-500/20 text-green-300 p-2 mb-3 rounded" role="alert">
                 Blog created successfully! Redirecting...
               </div>
             )}
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="title" className="block text-white text-lg font-medium mb-2">
+                <label htmlFor="title" className="block text-white text-sm font-medium mb-1">
                   Title
                 </label>
                 <input
                   type="text"
                   id="title"
-                  name="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-800 text-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                  className="w-full p-2 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
                   placeholder="Enter blog title"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="content" className="block text-white text-lg font-medium mb-2">
+                <label htmlFor="content" className="block text-white text-sm font-medium mb-1">
                   Content
                 </label>
                 <textarea
                   id="content"
-                  name="content"
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 h-40 resize-y"
+                  className="w-full p-2 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 h-24 resize-y text-sm"
+                  placeholder="Enter blog content"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="image" className="block text-white text-lg font-medium mb-2">
+                <label htmlFor="image" className="block text-white text-sm font-medium mb-1">
                   Image (Optional)
                 </label>
                 <input
                   type="file"
                   id="image"
-                  name="image"
                   onChange={handleImageChange}
-                  className="w-full p-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  className="w-full p-2 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
                   accept="image/*"
                 />
                 {preview && (
-                  <div className="mt-4">
-                    <img src={preview} alt="Blog preview" className="w-32 h-32 object-cover rounded-lg" />
+                  <div className="mt-2">
+                    <img src={preview} alt="Blog preview" className="w-24 h-24 object-cover rounded" />
                   </div>
                 )}
               </div>
@@ -146,14 +147,14 @@ function CreateBlogWithSidebar() {
                 type="submit"
                 disabled={loading}
                 whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-lg disabled:opacity-50"
-              >
+                className="w-full py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded text-sm disabled:opacity-50"
+                >
                 {loading ? 'Creating...' : 'Create Blog'}
               </motion.button>
             </form>
           </motion.div>
         </main>
+        <Sidebar className="fixed right-0 top-0 h-screen z-40 hidden lg:block" />
       </div>
     </>
   );

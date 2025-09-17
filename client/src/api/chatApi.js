@@ -7,7 +7,8 @@ export const uploadFile = async (file, roomId, user) => {
   formData.append("userId", user.id);
   formData.append("userName", user.name);
 
-  const res = await axios.post("http://localhost:5000/api/upload", formData, {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+  const res = await axios.post(`${API_BASE_URL}/upload`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
     withCredentials: true,
   });

@@ -62,7 +62,7 @@ exports.verifyOTP = async (req, res) => {
   await newUser.save();
   await OTP.deleteOne({ _id: otpRecord._id });
 
-  const token = jwt.sign({ role: "user", email }, SECRET_KEY, { expiresIn: "1h" });
+  const token = jwt.sign({ userId: newUser._id, role: "user", email }, SECRET_KEY, { expiresIn: "1h" });
 
   res.json({
     success: true,
@@ -85,7 +85,7 @@ exports.login = async (req, res) => {
     return res.status(401).json({ success: false, message: "Invalid credentials" });
   }
 
-  const token = jwt.sign({ role: "user", email }, SECRET_KEY, { expiresIn: "1h" });
+  const token = jwt.sign({ userId: user._id, role: "user", email }, SECRET_KEY, { expiresIn: "1h" });
 
   res.json({
     success: true,
