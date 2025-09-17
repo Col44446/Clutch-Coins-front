@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import SEOHead from '../components/common/SEOHead';
+import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 
 function AllGames() {

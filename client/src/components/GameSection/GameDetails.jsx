@@ -83,7 +83,7 @@ const GameDetails = memo(() => {
         gameId: game._id || id,
         gameName: game.title,
         gamePageName: game.title,
-        gameImage: game.image || 'https://via.placeholder.com/400x600',
+        gameImage: game.portraitImage || game.image || 'https://via.placeholder.com/400x600',
         currencyName: selectedCurrency.name,
         amount: selectedCurrency.amount,
         quantity,
@@ -125,6 +125,8 @@ const GameDetails = memo(() => {
             publisher: fetchedGame.publisher || 'Unknown',
             description: fetchedGame.description || 'No description available',
             image: fetchedGame.image || 'https://via.placeholder.com/400x600',
+            portraitImage: fetchedGame.portraitImage || fetchedGame.image || 'https://via.placeholder.com/400x600',
+            squareImage: fetchedGame.squareImage || 'https://via.placeholder.com/400x400',
             offers: fetchedGame.offers || [],
             currencies: fetchedGame.currencies || []
           });
@@ -245,10 +247,11 @@ const GameDetails = memo(() => {
                 className="flex justify-center order-1 lg:order-2"
               >
                 <img
-                  src={game.image}
+                  src={game.portraitImage}
                   alt={game.title}
                   onError={(e) => { e.target.src = 'https://via.placeholder.com/400x600'; }}
                   className="w-40 h-48 sm:w-48 sm:h-64 object-contain rounded-md shadow-md border border-cyan-500"
+                  style={{ aspectRatio: '9/16' }}
                   loading="lazy"
                 />
               </motion.div>
@@ -266,10 +269,11 @@ const GameDetails = memo(() => {
             >
               <div className="flex flex-col md:flex-row items-start gap-3">
                 <img
-                  src={game.image}
+                  src={game.squareImage}
                   alt={game.title}
-                  onError={(e) => { e.target.src = 'https://via.placeholder.com/200x300'; }}
-                  className="w-full md:w-24 h-36 object-contain rounded-md shadow border border-cyan-500 hover:scale-105 transition-transform duration-200"
+                  onError={(e) => { e.target.src = 'https://via.placeholder.com/200x200'; }}
+                  className="w-full md:w-24 h-24 object-contain rounded-md shadow border border-cyan-500 hover:scale-105 transition-transform duration-200"
+                  style={{ aspectRatio: '1/1' }}
                   loading="lazy"
                 />
                 <div className="space-y-1">
@@ -377,10 +381,11 @@ const GameDetails = memo(() => {
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 bg-gray-800 rounded flex items-center justify-center border border-gray-600">
                           <img
-                            src={game.image}
+                            src={game.squareImage}
                             alt={game.title}
                             onError={(e) => { e.target.src = 'https://via.placeholder.com/32'; }}
                             className="w-6 h-6 object-contain rounded"
+                            style={{ aspectRatio: '1/1' }}
                             loading="lazy"
                           />
                         </div>

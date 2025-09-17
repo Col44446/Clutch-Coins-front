@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { loginAdmin, createBlog, createAdmin, getAllAdmins, deleteAdmin } = require("../controllers/adminControler");
-const upload = require("../middleware/upload");
-const adminAuth = require("../middleware/adminAuth"); // 🔹 JWT middleware import
-const { logout } = require("../controllers/logoutController"); // ⬅️ import
+const { upload } = require("../middleware/upload");
+const adminAuth = require("../middleware/adminAuth");
+const { logout } = require("../controllers/logoutController");
 
 // Admin login route
 router.post("/login", loginAdmin);
@@ -16,5 +16,15 @@ router.post("/blog", adminAuth, upload.single("image"), createBlog);
 router.post("/create-admin", adminAuth, createAdmin);
 router.get("/admins", adminAuth, getAllAdmins);
 router.delete("/admin/:adminId", adminAuth, deleteAdmin);
+
+// Error handling middleware
+router.use((err, req, res, next) => {
+  console.error('Admin route error:', err);
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
 
 module.exports = router;

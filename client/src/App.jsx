@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import ErrorBoundary from './components/common/ErrorBoundary';
@@ -45,6 +46,7 @@ import DeliveryInfo from './pages/DeliveryInfo';
 import NotFound from './pages/NotFound';
 import AuthCallback from './pages/AuthCallback';
 import HomeGames from './pages/Admin/HomeGames';
+import SearchResults from './pages/SearchResults';
 
 function App() {
   // Initialize SEO monitoring
@@ -66,6 +68,7 @@ function App() {
         <Route path="/blogs" element={<BlogsList />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/search" element={<SearchResults />} />
         <Route path="/games" element={<AllGame />} />
         <Route path="/games/:id" element={<GameDetails />} />
         

@@ -14,12 +14,17 @@ const GameCard = () => {
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/games`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const headers = {};
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+        
+        const response = await axios.get(`${API_BASE_URL}/games`, { headers });
+        console.log("Games Data:", response.data); // Debug log
         setGames(response.data.data || []);
       } catch (err) {
-        if (err.response?.status === 401) {
+        console.error("Fetch Games Error:", err.response || err.message);
+        if (err.response?.status === 401 && token) {
           localStorage.removeItem("token");
           navigate("/login");
         } else {
@@ -27,8 +32,25 @@ const GameCard = () => {
         }
       }
     };
-    if (token) fetchGames();
+    fetchGames();
   }, [token, navigate, API_BASE_URL]);
+
+  // Handle card navigation
+  const handleCardClick = (gameId) => {
+    if (!gameId) {
+      console.error("Invalid gameId:", gameId);
+      setError("Cannot navigate: Invalid game ID");
+      return;
+    }
+    console.log("Navigating to:", `/games/${gameId}`);
+    navigate(`/games/${gameId}`);
+  };
+
+  // Handle View More navigation
+  const handleViewMore = () => {
+    console.log("Navigating to: /games");
+    navigate("/games");
+  };
 
   if (error) {
     return <div className="text-red-300 text-center py-4">{error}</div>;
@@ -43,24 +65,27 @@ const GameCard = () => {
       <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight mb-4">
         More Games
       </h1>
-      <div className="bg-gray-900 p-4 rounded-xl">
+      <div className="bg-gray-900 p-4 rounded-xl relative">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none"></div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 max-w-6xl mx-auto">
           {games.map((game, index) => (
             <article
               key={game._id || index}
-              onClick={() => navigate(`/games/${game._id}`)}
+              onClick={() => handleCardClick(game._id)}
               className="bg-indigo-950/60 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 border border-white/10 overflow-hidden group relative cursor-pointer"
             >
               {/* Image */}
-              <div className="relative h-32 sm:h-40">
+              <div className="relative w-full aspect-[9/16]">
                 <img
                   src={game.image}
-                  alt={`${game.title} - Gaming recharge and top-up services available on ClutchCoins platform`}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  alt={`${game.title} game cover`}
+                  className="w-full h-full object-contain rounded-t-lg transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
-                  onError={() => {}}
+                  onError={(e) => {
+                    console.error(`Image failed to load: ${game.image}`);
+                    e.target.src = "/fallback-image.jpg";
+                  }}
                 />
                 
                 {/* Hover overlay */}
@@ -78,7 +103,10 @@ const GameCard = () => {
         </div>
 
         <div className="mt-4 text-center">
-          <button className="px-4 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-800 text-white font-medium text-xs rounded-full shadow-lg hover:from-cyan-500 hover:to-blue-700 hover:shadow-xl hover:scale-105 transition-all duration-300">
+          <button
+            onClick={handleViewMore}
+            className="px-4 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-800 text-white font-medium text-xs rounded-full shadow-lg hover:from-cyan-500 hover:to-blue-700 hover:shadow-xl hover:scale-105 transition-all duration-300"
+          >
             View More
           </button>
         </div>
