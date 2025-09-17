@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Navigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import Sidebar from './sidebar';
 
@@ -18,27 +18,59 @@ function AddGame({ isEdit = false }) {
   const [currencyName, setCurrencyName] = useState('');
   const [currencyAmount, setCurrencyAmount] = useState('');
   const [currenciesList, setCurrenciesList] = useState([]);
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [portraitImage, setPortraitImage] = useState(null);
+  const [squareImage, setSquareImage] = useState(null);
+  const [portraitPreview, setPortraitPreview] = useState(null);
+  const [squarePreview, setSquarePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
-  const handleImageChange = (e) => {
+  const handleImageChange = (e, imageType) => {
     const file = e.target.files[0];
     if (file) {
-      if (!['image/jpeg', 'image/png'].includes(file.type)) {
-        setError('Only JPEG or PNG images are allowed');
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+      if (!validTypes.includes(file.type)) {
+        setError('Only JPEG, PNG, WEBP, or AVIF images are allowed');
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Image size must be less than 5MB');
+      if (file.size > 10 * 1024 * 1024) {
+        setError('Image size must be less than 10MB');
         return;
       }
-      setImage(file);
-      setPreview(URL.createObjectURL(file));
+
+      // Validate aspect ratio
+      const img = new Image();
+      img.onload = () => {
+        const aspectRatio = img.width / img.height;
+        let isValid = false;
+        let expectedRatio = '';
+
+        if (imageType === 'portrait') {
+          isValid = Math.abs(aspectRatio - 9/16) < 0.01;
+          expectedRatio = '9:16';
+        } else if (imageType === 'square') {
+          isValid = Math.abs(aspectRatio - 1) < 0.01;
+          expectedRatio = '1:1';
+        }
+
+        if (!isValid) {
+          setError(`${imageType === 'portrait' ? 'Portrait' : 'Square'} image must have ${expectedRatio} aspect ratio`);
+          return;
+        }
+
+        if (imageType === 'portrait') {
+          setPortraitImage(file);
+          setPortraitPreview(URL.createObjectURL(file));
+        } else {
+          setSquareImage(file);
+          setSquarePreview(URL.createObjectURL(file));
+        }
+        setError('');
+      };
+      img.src = URL.createObjectURL(file);
     }
   };
 
@@ -88,7 +120,8 @@ function AddGame({ isEdit = false }) {
           setDescription(game.description || '');
           setOffersList(game.offers || []);
           setCurrenciesList(game.currencies || []);
-          setPreview(game.image ? `${API_BASE_URL}/../${game.image}` : null);
+          setPortraitPreview(game.portraitImage || game.image || null);
+          setSquarePreview(game.squareImage || null);
         } catch (err) {
           setError(err.response?.data?.message || 'Failed to fetch game data');
         } finally {
@@ -105,42 +138,94 @@ function AddGame({ isEdit = false }) {
     setError(null);
     setSuccess(false);
 
-    if (!title.trim() || !publisher.trim() || !description.trim()) {
-      setError('Title, publisher, and description are required');
-      setLoading(false);
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('title', title.trim());
-    formData.append('publisher', publisher.trim());
-    formData.append('description', description.trim());
-    formData.append('offers', JSON.stringify(offersList));
-    formData.append('currencies', JSON.stringify(currenciesList));
-    if (image) formData.append('image', image);
-
     try {
+      // Validate required fields
+      if (!title.trim() || !publisher.trim() || !description.trim()) {
+        throw new Error('Please fill in all required fields');
+      }
+
+      if (!isEdit && (!portraitImage || !squareImage)) {
+        throw new Error('Both portrait (9:16) and square (1:1) images are required');
+      }
+
+      // Create FormData
+      const formData = new FormData();
+      
+      // Add text fields
+      formData.append('title', title.trim());
+      formData.append('publisher', publisher.trim());
+      formData.append('description', description.trim());
+      
+      // Add offers if any
+      formData.append('offers', JSON.stringify(offersList.length > 0 ? offersList : []));
+      
+      // Add currencies if any
+      formData.append('currencies', JSON.stringify(currenciesList.length > 0 ? currenciesList : []));
+      
+      // Add images if provided
+      if (portraitImage) {
+        formData.append('portraitImage', portraitImage);
+      }
+      if (squareImage) {
+        formData.append('squareImage', squareImage);
+      }
+
+      // Log FormData contents for debugging
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
       const url = isEdit ? `${API_BASE_URL}/games/${id}` : `${API_BASE_URL}/games`;
       const method = isEdit ? 'put' : 'post';
+      
+      // Log the form data for debugging
+      console.log('Submitting form with data:', {
+        title: title.trim(),
+        publisher: publisher.trim(),
+        description: description.trim(),
+        hasPortraitImage: !!portraitImage,
+        hasSquareImage: !!squareImage,
+        offersCount: offersList.length,
+        currenciesCount: currenciesList.length
+      });
+
       const response = await axios({
         method,
         url,
         data: formData,
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
-        timeout: 10000,
+        timeout: 30000, // Increased timeout to 30 seconds
       });
 
-      if (response.data.success) {
+      if (response.data && response.data.success) {
         setSuccess(true);
         setTimeout(() => navigate('/admin/game'), 2000);
       } else {
-        setError(response.data.message || `Failed to ${isEdit ? 'update' : 'create'} game`);
+        const errorMsg = response.data?.message || `Failed to ${isEdit ? 'update' : 'create'} game`;
+        setError(errorMsg);
+        console.error('Server response:', response.data);
       }
     } catch (err) {
-      setError(err.response?.data?.message || `Failed to ${isEdit ? 'update' : 'create'} game`);
+      console.error('Error submitting form:', err);
+      const errorMsg = err.response?.data?.message || 
+                      err.response?.data?.error || 
+                      err.message || 
+                      `Failed to ${isEdit ? 'update' : 'create'} game. Please try again.`;
+      setError(errorMsg);
+      
+      // Log detailed error information
+      if (err.response) {
+        console.error('Error response data:', err.response.data);
+        console.error('Error status:', err.response.status);
+        console.error('Error headers:', err.response.headers);
+      } else if (err.request) {
+        console.error('No response received:', err.request);
+      } else {
+        console.error('Error message:', err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -281,16 +366,45 @@ function AddGame({ isEdit = false }) {
                   ))}
                 </div>
               </div>
-              <div>
-                <label className="block text-white text-sm font-medium mb-1">Image (optional)</label>
-                <input
-                  id="game-image"
-                  type="file"
-                  onChange={handleImageChange}
-                  className="w-full p-2 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
-                  accept="image/*"
-                />
-                {preview && <img src={preview} alt="Game preview" className="mt-2 w-24 h-24 object-cover rounded" />}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-white text-sm font-medium mb-1">Portrait Image (9:16) *</label>
+                  <input
+                    id="portrait-image"
+                    type="file"
+                    onChange={(e) => handleImageChange(e, 'portrait')}
+                    className="w-full p-2 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
+                    accept="image/*"
+                    required={!isEdit}
+                  />
+                  {portraitPreview && (
+                    <img 
+                      src={portraitPreview} 
+                      alt="Portrait preview" 
+                      className="mt-2 w-16 h-28 object-cover rounded" 
+                      style={{ aspectRatio: '9/16' }}
+                    />
+                  )}
+                </div>
+                <div>
+                  <label className="block text-white text-sm font-medium mb-1">Square Image (1:1) *</label>
+                  <input
+                    id="square-image"
+                    type="file"
+                    onChange={(e) => handleImageChange(e, 'square')}
+                    className="w-full p-2 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 text-sm"
+                    accept="image/*"
+                    required={!isEdit}
+                  />
+                  {squarePreview && (
+                    <img 
+                      src={squarePreview} 
+                      alt="Square preview" 
+                      className="mt-2 w-24 h-24 object-cover rounded" 
+                      style={{ aspectRatio: '1/1' }}
+                    />
+                  )}
+                </div>
               </div>
               <motion.button
                 type="submit"

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, X, Mail, Lock, LogIn, KeyRound, CheckCircle2 } from "lucide-react";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 
@@ -19,8 +19,8 @@ const Login = ({ onClose, onSwitch, onLogin }) => {
 
     const isAdmin = email.toLowerCase().includes("admin");
     const url = isAdmin
-      ? `${import.meta.env.VITE_API_BASE_URL}/admin/login`
-      : `${import.meta.env.VITE_API_BASE_URL}/users/login`;
+      ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/admin/login`
+      : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/users/login`;
 
     try {
       const res = await fetch(url, {

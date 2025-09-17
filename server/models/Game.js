@@ -11,7 +11,9 @@ const offerSchema = new mongoose.Schema({
 });
 
 const gameSchema = new mongoose.Schema({
-  image: { type: String, required: false },
+  image: { type: String, required: false }, // Keep for backward compatibility
+  portraitImage: { type: String, required: false }, // 9:16 aspect ratio image
+  squareImage: { type: String, required: false }, // 1:1 aspect ratio image
   title: { type: String, required: true },
   publisher: { type: String, required: true },
   description: { type: String, required: true },

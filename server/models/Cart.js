@@ -59,10 +59,13 @@ const cartItemSchema = new mongoose.Schema({
 
 const cartSchema = new mongoose.Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: mongoose.Schema.Types.Mixed, // Allow both ObjectId and String
     required: [true, 'User ID is required'],
     index: true
+  },
+  originalUserId: { // Store original string userId for reference
+    type: String,
+    required: false
   },
   items: [cartItemSchema],
   totalAmount: {

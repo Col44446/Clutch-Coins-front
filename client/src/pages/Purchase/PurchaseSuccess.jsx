@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { FaCheckCircle, FaDownload, FaHome, FaShoppingCart } from 'react-icons/fa';
 
 function PurchaseSuccess() {

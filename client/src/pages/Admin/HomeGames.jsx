@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import axios from "axios";
 import Sidebar from "./sidebar";
 
@@ -16,10 +16,13 @@ const HomeGames = () => {
   const [modalType, setModalType] = useState("");
   const [selectedGame, setSelectedGame] = useState("");
   const [uploadImage, setUploadImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [showImagePreviewModal, setShowImagePreviewModal] = useState(false);
+  const [previewImageUrl, setPreviewImageUrl] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch games data with optimized image URLs
+  // Fetch games data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -61,25 +64,86 @@ const HomeGames = () => {
     if (token) fetchData();
   }, [token, API_BASE_URL]);
 
+  // Handle image selection with aspect ratio validation
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setUploadImage(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = () => {
+          const aspectRatio = img.width / img.height;
+          
+          // Different aspect ratios for different modal types
+          let targetAspectRatio, errorMessage;
+          if (modalType === "hero") {
+            targetAspectRatio = 16 / 9; // Hero games use 16:9
+            errorMessage = "Please upload an image with a 16:9 aspect ratio (e.g., 1600px × 900px)";
+          } else {
+            targetAspectRatio = 9 / 16; // Trending games use 9:16
+            errorMessage = "Please upload an image with a 9:16 aspect ratio (e.g., 900px × 1600px)";
+          }
+          
+          if (Math.abs(aspectRatio - targetAspectRatio) > 0.01) {
+            setError(errorMessage);
+          } else {
+            setError(null);
+          }
+        };
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
+      setError(null);
+    }
+  };
+
+  // Open upload modal
   const openModal = (type) => {
     setModalType(type);
     setShowModal(true);
     setSelectedGame("");
     setUploadImage(null);
+    setImagePreview(null);
     setError(null);
   };
 
+  // Save handler
   const handleSave = async () => {
     if (!selectedGame || !uploadImage) {
       setError("Please select a game and upload an image");
       return;
     }
-    if (!["image/jpeg", "image/png"].includes(uploadImage.type)) {
-      setError("Only JPEG or PNG images are allowed");
+    if (!["image/jpeg", "image/png", "image/webp", "image/avif"].includes(uploadImage.type)) {
+      setError("Only JPEG, PNG, WEBP, or AVIF images are allowed");
       return;
     }
     if (uploadImage.size > 5 * 1024 * 1024) {
       setError("Image size must be less than 5MB");
+      return;
+    }
+
+    // Validate aspect ratio before saving
+    const img = new Image();
+    img.src = URL.createObjectURL(uploadImage);
+    await new Promise((resolve) => (img.onload = resolve));
+    const aspectRatio = img.width / img.height;
+    
+    // Different aspect ratios for different modal types
+    let targetAspectRatio, errorMessage;
+    if (modalType === "hero") {
+      targetAspectRatio = 16 / 9; // Hero games use 16:9
+      errorMessage = "Image must have a 16:9 aspect ratio";
+    } else {
+      targetAspectRatio = 9 / 16; // Trending games use 9:16
+      errorMessage = "Image must have a 9:16 aspect ratio";
+    }
+    
+    if (Math.abs(aspectRatio - targetAspectRatio) > 0.01) {
+      setError(errorMessage);
       return;
     }
 
@@ -115,6 +179,7 @@ const HomeGames = () => {
             }))
           );
       setShowModal(false);
+      setImagePreview(null);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save game");
     } finally {
@@ -122,6 +187,7 @@ const HomeGames = () => {
     }
   };
 
+  // Delete handler
   const handleDelete = async (type, id) => {
     try {
       const url = type === "hero" ? `${API_BASE_URL}/featured/hero/${id}` : `${API_BASE_URL}/featured/trending/${id}`;
@@ -132,6 +198,12 @@ const HomeGames = () => {
     } catch (err) {
       setError(err.response?.data?.message || "Failed to delete game");
     }
+  };
+
+  // Open preview modal for listed image
+  const openImagePreview = (url) => {
+    setPreviewImageUrl(url);
+    setShowImagePreviewModal(true);
   };
 
   if (!token) return <Navigate to="/login" replace />;
@@ -204,8 +276,9 @@ const HomeGames = () => {
                           <img
                             src={game.displayImage}
                             alt={game.gameId?.title ? `Hero game: ${game.gameId.title}` : "Hero game image"}
-                            className="w-12 h-12 object-cover rounded"
+                            className="w-12 h-12 object-cover rounded cursor-pointer"
                             loading="lazy"
+                            onClick={() => openImagePreview(game.displayImage)}
                             onError={(e) => {
                               console.error(`Image failed to load: ${game.displayImage}`);
                               e.target.src = "/fallback-image.jpg";
@@ -258,19 +331,20 @@ const HomeGames = () => {
                             srcSet={game.displayImageWebP}
                             type="image/webp"
                             media="(min-width: 768px)"
-                            sizes="80px"
+                            sizes="48px"
                           />
                           <source
                             srcSet={game.displayImageSmall}
                             type="image/jpeg"
                             media="(max-width: 767px)"
-                            sizes="80px"
+                            sizes="48px"
                           />
                           <img
                             src={game.displayImage}
                             alt={game.gameId?.title ? `Trending game: ${game.gameId.title}` : "Trending game image"}
-                            className="w-12 h-12 object-cover rounded"
+                            className="w-12 h-[85.33px] object-contain rounded cursor-pointer"
                             loading="lazy"
+                            onClick={() => openImagePreview(game.displayImage)}
                             onError={(e) => {
                               console.error(`Image failed to load: ${game.displayImage}`);
                               e.target.src = "/fallback-image.jpg";
@@ -298,7 +372,7 @@ const HomeGames = () => {
             )}
           </motion.div>
 
-          {/* Modal */}
+          {/* Upload Modal */}
           {showModal && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -333,11 +407,23 @@ const HomeGames = () => {
                 </select>
                 <input
                   type="file"
-                  accept="image/jpeg,image/png"
+                  accept="image/jpeg,image/png,image/webp,image/avif"
                   className="w-full p-2 bg-gray-700 text-white rounded text-xs sm:text-sm mb-2"
-                  onChange={(e) => setUploadImage(e.target.files[0])}
+                  onChange={handleImageChange}
                   aria-label="Upload game image"
                 />
+                {imagePreview && (
+                  <div className="mb-2">
+                    <p className="text-xs text-white mb-1">
+                      Upload Preview ({modalType === "hero" ? "16:9" : "9:16"}):
+                    </p>
+                    <img
+                      src={imagePreview}
+                      alt="Upload preview"
+                      className={modalType === "hero" ? "w-[85.33px] h-12 object-contain rounded" : "w-12 h-[85.33px] object-contain rounded"}
+                    />
+                  </div>
+                )}
                 <div className="flex justify-end gap-2">
                   <motion.button
                     onClick={() => setShowModal(false)}
@@ -357,6 +443,42 @@ const HomeGames = () => {
                     aria-label="Save game"
                   >
                     {loading ? "Saving..." : "Save"}
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Listed Image Preview Modal */}
+          {showImagePreviewModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-3 sm:p-4"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="preview-modal-title"
+            >
+              <div className="bg-gray-800 p-3 sm:p-4 rounded-lg max-w-sm w-full text-center">
+                <h2 id="preview-modal-title" className="text-sm sm:text-base font-bold text-white mb-2">
+                  Image Preview (9:16)
+                </h2>
+                <img
+                  src={previewImageUrl}
+                  alt="Listed image preview"
+                  className="max-w-full h-auto object-contain rounded mx-auto"
+                  style={{ aspectRatio: '9/16', maxHeight: '80vh' }}
+                />
+                <div className="flex justify-center mt-4">
+                  <motion.button
+                    onClick={() => setShowImagePreviewModal(false)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="py-1 px-3 bg-gray-600 text-white rounded text-xs sm:text-sm touch-manipulation"
+                    aria-label="Close preview"
+                  >
+                    Close
                   </motion.button>
                 </div>
               </div>

@@ -14,6 +14,7 @@ function Header() {
   const [showChat, setShowChat] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Listen for authentication state changes and cart updates
   useEffect(() => {
@@ -92,12 +93,27 @@ function Header() {
     }
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+      setIsOpen(false); // Close mobile menu if open
+    }
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch(e);
+    }
+  };
+
   const fetchCartItems = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await fetch('/api/cart', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/cart`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -225,14 +241,17 @@ function Header() {
                   </motion.div>
                 ))}
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-2 flex flex-col gap-2">
-                  <div className="flex items-center gap-1">
+                  <form onSubmit={handleSearch} className="flex items-center gap-1">
                     <Search className="w-4 h-4 text-white" />
                     <input
                       type="text"
-                      placeholder="Search..."
-                      className="bg-gray-800 text-white rounded px-2 py-1 text-xs w-full"
+                      placeholder="Search games..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyPress={handleSearchKeyPress}
+                      className="bg-gray-800 text-white rounded px-2 py-1 text-xs w-full focus:outline-none focus:ring-1 focus:ring-cyan-500"
                     />
-                  </div>
+                  </form>
                   {isAuthenticated ? (
                     <motion.button
                       onClick={handleLogout}
@@ -280,14 +299,17 @@ function Header() {
               ))}
             </div>
             <div className="flex items-center space-x-2">
-              <div className="flex items-center gap-1">
+              <form onSubmit={handleSearch} className="flex items-center gap-1">
                 <Search className="w-4 h-4 text-white" />
                 <input
                   type="text"
-                  placeholder="Search..."
-                  className="bg-gray-800 text-white rounded px-2 py-1 text-xs"
+                  placeholder="Search games..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
+                  className="bg-gray-800 text-white rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-cyan-500"
                 />
-              </div>
+              </form>
               {isAuthenticated ? (
                 <div className="flex items-center gap-1">
                   <motion.button

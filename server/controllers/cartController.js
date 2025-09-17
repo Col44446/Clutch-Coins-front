@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Cart = require('../models/Cart');
 const Game = require('../models/Game');
 
@@ -22,14 +23,13 @@ exports.getCart = async (req, res) => {
 // Add item to cart
 exports.addToCart = async (req, res) => {
   try {
-    console.log('Cart add request received:', {
-      userId: req.user?.id,
-      body: req.body,
-      headers: req.headers.authorization ? 'Present' : 'Missing'
-    });
-
     const userId = req.user.id;
-    const { gameId, gameName, gamePageName, gameImage, currencyName, amount, gameUserId, quantity = 1 } = req.body;
+    const { gameId, gameName, gamePageName, gameImage, currencyName, amount, quantity = 1, gameUserId } = req.body;
+
+    console.log('=== CART ADD REQUEST START ===');
+    console.log('User ID from token:', userId);
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    console.log('Request headers:', JSON.stringify(req.headers, null, 2));
 
     // Validate required fields
     if (!gameId) {
@@ -50,17 +50,44 @@ exports.addToCart = async (req, res) => {
     }
 
     console.log('Searching for game with ID:', gameId);
+    
+    // Validate gameId format
+    if (!mongoose.Types.ObjectId.isValid(gameId)) {
+      console.log('Invalid gameId format:', gameId);
+      return res.status(400).json({ success: false, message: "Invalid game ID format" });
+    }
+    
     const game = await Game.findById(gameId);
     if (!game) {
       console.log('Game not found with ID:', gameId);
       return res.status(404).json({ success: false, message: "Game not found" });
     }
 
-    console.log('Game found:', game.title);
-    let cart = await Cart.findOne({ userId });
+    console.log('Game found:', game.title || game.name);
+    
+    // Handle userId - support both ObjectId and string userIds
+    let cart;
+    try {
+      // Try to find cart by userId (works for both ObjectId and string)
+      cart = await Cart.findOne({ userId });
+      
+      // If not found and userId is a string, also try to find by originalUserId
+      if (!cart && !mongoose.Types.ObjectId.isValid(userId)) {
+        cart = await Cart.findOne({ originalUserId: userId });
+      }
+    } catch (error) {
+      console.log('Error finding cart, will create new one:', error.message);
+    }
+    
     if (!cart) {
       console.log('Creating new cart for user:', userId);
+      // Create cart with the userId directly (Mixed type supports both ObjectId and string)
       cart = new Cart({ userId, items: [] });
+      
+      // If userId is a string, also store it in originalUserId for reference
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        cart.originalUserId = userId;
+      }
     }
 
     // Check if item already exists in cart
@@ -79,9 +106,9 @@ exports.addToCart = async (req, res) => {
       console.log('Adding new item to cart');
       const newItem = {
         gameId,
-        gameName: gameName || game.title,
-        gamePageName: gamePageName || game.pageName || game.title,
-        gameImage: gameImage || game.image || '/api/placeholder/400/600',
+        gameName: gameName || game.title || game.name || 'Unknown Game',
+        gamePageName: gamePageName || game.pageName || game.title || game.name || 'unknown',
+        gameImage: gameImage || game.portraitImage || game.image || '/api/placeholder/400/600',
         currencyName,
         amount: parseFloat(amount),
         quantity: parseInt(quantity),
@@ -92,9 +119,16 @@ exports.addToCart = async (req, res) => {
     }
 
     console.log('Saving cart...');
-    await cart.save();
-    console.log('Cart saved successfully');
-    res.json({ success: true, data: cart, message: 'Item added to cart successfully' });
+    console.log('Cart before save:', JSON.stringify(cart, null, 2));
+    
+    try {
+      await cart.save();
+      console.log('Cart saved successfully');
+      res.json({ success: true, data: cart, message: 'Item added to cart successfully' });
+    } catch (saveError) {
+      console.error('Cart save error:', saveError);
+      throw saveError; // Re-throw to be caught by outer catch block
+    }
   } catch (error) {
     console.error('Cart add error details:', {
       message: error.message,
