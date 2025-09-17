@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Helmet } from 'react-helmet-async';
+import { HelmetProvider } from "react-helmet-async";
 import axios from 'axios';
-
+import SEOHead from '../components/common/SEOHead';
 function AllGames() {
   const [games, setGames] = useState([]);
   const [groupedGames, setGroupedGames] = useState({});
