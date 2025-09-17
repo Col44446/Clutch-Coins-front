@@ -17,10 +17,8 @@ const GameCard = () => {
         const response = await axios.get(`${API_BASE_URL}/games`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Games Data:", response.data); // Debug log
         setGames(response.data.data || []);
       } catch (err) {
-        console.error("Fetch Games Error:", err.response || err.message);
         if (err.response?.status === 401) {
           localStorage.removeItem("token");
           navigate("/login");
@@ -59,10 +57,10 @@ const GameCard = () => {
               <div className="relative h-32 sm:h-40">
                 <img
                   src={game.image}
-                  alt={`${game.title} game cover`}
+                  alt={`${game.title} - Gaming recharge and top-up services available on ClutchCoins platform`}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
-                  onError={() => console.error(`Image failed to load: ${game.image}`)}
+                  onError={() => {}}
                 />
                 
                 {/* Hover overlay */}

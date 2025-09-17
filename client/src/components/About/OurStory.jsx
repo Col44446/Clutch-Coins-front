@@ -1,8 +1,37 @@
 import React from "react";
 import PropTypes from 'prop-types';
+import SEOHead from '../common/SEOHead';
 
 const OurStory = () => (
-  <div className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 min-h-screen bg-gradient-to-b from-slate-900 to-slate-950">
+  <>
+    <SEOHead 
+      title="About ClutchCoins - Our Gaming Revolution Story"
+      description="Learn about ClutchCoins' mission to revolutionize gaming through secure, instant recharge services. Founded by passionate gamers for the gaming community."
+      keywords="ClutchCoins story, gaming platform, about us, gaming revolution, secure recharge, gaming community, company history"
+      url="https://clutchcoins.com/about"
+      structuredData={{
+        "@context": "https://schema.org",
+        "@type": "AboutPage",
+        "mainEntity": {
+          "@type": "Organization",
+          "name": "ClutchCoins",
+          "description": "Revolutionary gaming recharge and top-up platform founded by passionate gamers",
+          "foundingDate": "2023",
+          "founder": {
+            "@type": "Person",
+            "name": "ClutchCoins Team"
+          },
+          "mission": "Making gaming more accessible and rewarding for everyone through secure, reliable recharge services",
+          "url": "https://clutchcoins.com",
+          "sameAs": [
+            "https://facebook.com/clutchcoins",
+            "https://twitter.com/clutchcoins",
+            "https://instagram.com/clutchcoins"
+          ]
+        }
+      }}
+    />
+    <div className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 min-h-screen bg-gradient-to-b from-slate-900 to-slate-950">
     <div className="max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold text-white mb-6">Our Story</h1>
       
@@ -113,6 +142,7 @@ const OurStory = () => (
       </div>
     </div>
   </div>
+  </>
 );
 
 export default OurStory;

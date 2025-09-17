@@ -1,124 +1,99 @@
 import React, { useState, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 /**
- * Optimized lazy loading image component with responsive support
- * Provides better performance and user experience
+ * Optimized lazy loading image component with performance enhancements
  */
 const LazyImage = ({
   src,
   alt,
   className = '',
-  placeholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjY2IiBmb250LXNpemU9IjE0Ij5Mb2FkaW5nLi4uPC90ZXh0Pgo8L3N2Zz4=',
-  sizes,
-  priority = false,
-  onLoad,
-  onError,
+  placeholder = 'https://via.placeholder.com/400x600/1f2937/9ca3af?text=Loading...',
+  fallback = 'https://via.placeholder.com/400x600/1f2937/ef4444?text=Error',
   ...props
 }) => {
+  const [imageSrc, setImageSrc] = useState(placeholder);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [isInView, setIsInView] = useState(priority);
-  const imgRef = useRef(null);
-  const observerRef = useRef(null);
+  const imgRef = useRef();
 
   useEffect(() => {
-    if (priority) return; // Skip lazy loading for priority images
+    if (!src || !imgRef.current) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          observer.disconnect();
-        }
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !isLoaded && !hasError) {
+            setIsLoading(true);
+            
+            const img = new Image();
+            img.onload = () => {
+              setImageSrc(src);
+              setIsLoaded(true);
+              setIsLoading(false);
+              observer.unobserve(entry.target);
+            };
+            img.onerror = () => {
+              setImageSrc(fallback);
+              setHasError(true);
+              setIsLoading(false);
+              observer.unobserve(entry.target);
+            };
+            img.src = src;
+          }
+        });
       },
-      {
-        rootMargin: '50px 0px',
-        threshold: 0.01,
+      { 
+        rootMargin: '50px',
+        threshold: 0.1 
       }
     );
 
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
-      observerRef.current = observer;
-    }
+    observer.observe(imgRef.current);
 
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
+      observer.disconnect();
     };
-  }, [priority]);
-
-  const handleLoad = (e) => {
-    setIsLoaded(true);
-    if (onLoad) onLoad(e);
-  };
-
-  const handleError = (e) => {
-    setHasError(true);
-    if (onError) onError(e);
-  };
-
-  const shouldLoad = priority || isInView;
+  }, [src, isLoaded, hasError, fallback]);
 
   return (
-    <div
-      ref={imgRef}
-      className={`relative overflow-hidden ${className}`}
-      {...props}
-    >
-      {/* Placeholder/Loading state */}
-      {!isLoaded && !hasError && (
-        <img
-          src={placeholder}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover blur-sm opacity-50 transition-opacity duration-300"
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Main image */}
-      {shouldLoad && (
-        <img
-          src={src}
-          alt={alt}
-          sizes={sizes}
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
-            isLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-          onLoad={handleLoad}
-          onError={handleError}
-          loading={priority ? 'eager' : 'lazy'}
-        />
-      )}
-
-      {/* Error state */}
-      {hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-gray-400">
-          <svg
-            className="w-8 h-8"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
+    <div className="relative">
+      <img
+        ref={imgRef}
+        src={imageSrc}
+        alt={alt}
+        className={`transition-all duration-300 ${
+          isLoaded ? 'opacity-100' : 'opacity-70'
+        } ${isLoading ? 'animate-pulse' : ''} ${className}`}
+        {...props}
+      />
+      
+      {/* Loading indicator */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-500"></div>
         </div>
       )}
-
-      {/* Loading indicator */}
-      {shouldLoad && !isLoaded && !hasError && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500"></div>
+      
+      {/* Error indicator */}
+      {hasError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-red-900 bg-opacity-20">
+          <div className="text-red-400 text-xs text-center p-2">
+            Failed to load image
+          </div>
         </div>
       )}
     </div>
   );
+};
+
+LazyImage.propTypes = {
+  src: PropTypes.string.isRequired,
+  alt: PropTypes.string.isRequired,
+  className: PropTypes.string,
+  placeholder: PropTypes.string,
+  fallback: PropTypes.string,
 };
 
 export default LazyImage;

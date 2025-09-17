@@ -18,10 +18,8 @@ function PopularGames() {
         const response = await axios.get(`${API_BASE_URL}/featured/trending`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Trending Games Data:", response.data); // Debug log
         setTrendingGames(response.data.data || []);
       } catch (err) {
-        console.error("Fetch Trending Games Error:", err.response || err.message);
         if (err.response?.status === 401) {
           localStorage.removeItem("token");
           navigate("/login");
@@ -105,10 +103,10 @@ function PopularGames() {
               <div className="relative h-48 sm:h-56">
                 <img
                   src={game.displayImage}
-                  alt={game.gameId?.title || "Trending Game"}
+                  alt={`${game.gameId?.title || "Trending Game"} - Instant recharge and top-up available on ClutchCoins`}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
-                  onError={() => console.error(`Image failed to load: ${game.displayImage}`)}
+                  onError={() => {}}
                 />
 
                 {/* Black Overlay with Top Up Button */}

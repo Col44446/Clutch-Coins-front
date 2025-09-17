@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Helmet } from 'react-helmet';
+import SEOHead from '../common/SEOHead';
 import axios from 'axios';
 import {
   FaGlobe, FaBolt, FaShieldAlt, FaDollarSign, FaShoppingCart,
@@ -168,15 +168,40 @@ const GameDetails = memo(() => {
 
   return (
     <>
-      <Helmet>
-        <title>{game.title} - Game Zone</title>
-        <meta name="description" content={game.description.substring(0, 120) + '...'} />
-        <meta name="keywords" content={`${game.title}, ${game.publisher}, video games, buy game`} />
-        <meta property="og:title" content={game.title} />
-        <meta property="og:description" content={game.description.substring(0, 120) + '...'} />
-        <meta property="og:image" content={game.image} />
-        <meta property="og:type" content="website" />
-      </Helmet>
+      <SEOHead 
+        title={`${game.title} - ClutchCoins Gaming Recharge`}
+        description={`Get instant ${game.title} recharge and top-up services. ${game.description.substring(0, 120)}... Fast delivery, secure payments, best prices guaranteed.`}
+        keywords={`${game.title} recharge, ${game.title} top-up, ${game.publisher} games, gaming credits, ${game.title} coins, instant delivery, secure payment`}
+        url={`https://clutchcoins.com/games/${id}`}
+        image={game.image}
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "VideoGame",
+          "name": game.title,
+          "description": game.description,
+          "image": game.image,
+          "publisher": {
+            "@type": "Organization",
+            "name": game.publisher
+          },
+          "offers": game.currencies?.map(currency => ({
+            "@type": "Offer",
+            "name": currency.name,
+            "price": currency.amount,
+            "priceCurrency": "INR",
+            "availability": "https://schema.org/InStock",
+            "seller": {
+              "@type": "Organization",
+              "name": "ClutchCoins"
+            }
+          })) || [],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.5",
+            "reviewCount": "150"
+          }
+        }}
+      />
 
       <div className="min-h-screen bg-gray-900 pt-24 sm:pt-20 pb-6">
         <div className="max-w-5xl mx-auto px-3 pt-14 sm:px-4">

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
+import SEOHead from '../components/common/SEOHead';
 
 const FAQ = () => {
   const [openFAQ, setOpenFAQ] = useState(null);
@@ -72,7 +73,26 @@ const FAQ = () => {
   };
 
   return (
-    <div className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 min-h-screen bg-gradient-to-b from-slate-900 to-slate-950">
+    <>
+      <SEOHead 
+        title="FAQ - ClutchCoins Gaming Support"
+        description="Get answers to frequently asked questions about ClutchCoins gaming recharge services. Learn about payments, delivery, refunds, and account security."
+        keywords="ClutchCoins FAQ, gaming recharge help, payment questions, delivery time, refund policy, account security, gaming support"
+        url="https://clutchcoins.com/faq"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": faqs.map(faq => ({
+            "@type": "Question",
+            "name": faq.question,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": faq.answer
+            }
+          }))
+        }}
+      />
+      <div className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 min-h-screen bg-gradient-to-b from-slate-900 to-slate-950">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <HelpCircle className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
@@ -128,6 +148,7 @@ const FAQ = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

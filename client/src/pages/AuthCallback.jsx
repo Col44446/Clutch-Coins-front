@@ -10,7 +10,6 @@ const AuthCallback = () => {
     const error = searchParams.get('error');
 
     if (error) {
-      console.error('Authentication error:', error);
       navigate('/', { replace: true });
       return;
     }
@@ -28,8 +27,6 @@ const AuthCallback = () => {
 
   const verifyTokenAndLogin = async (token) => {
     try {
-      console.log('Verifying token:', token.substring(0, 20) + '...');
-      
       const response = await fetch('/api/users/profile', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -37,11 +34,8 @@ const AuthCallback = () => {
         }
       });
 
-      console.log('Response status:', response.status);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('Profile data received:', data);
         
         if (data.success && data.user) {
           // Store user data
@@ -56,16 +50,12 @@ const AuthCallback = () => {
           const redirectPath = data.user.role === 'admin' ? '/admin-dashboard' : '/user-dashboard';
           navigate(redirectPath, { replace: true });
         } else {
-          console.error('Invalid response structure:', data);
           throw new Error('Invalid user data');
         }
       } else {
-        const errorData = await response.text();
-        console.error('API Error Response:', errorData);
         throw new Error(`Token verification failed: ${response.status}`);
       }
     } catch (error) {
-      console.error('Token verification error:', error);
       localStorage.removeItem('token');
       navigate('/', { replace: true });
     }

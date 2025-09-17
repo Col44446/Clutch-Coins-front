@@ -1,11 +1,10 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import SEOHead from './components/common/SEOHead';
 import CustomScrollbar from "./components/common/CustomScrollbar";
+import { initSEOMonitoring } from './utils/seoMonitor';
 import './App.css';
 import { Home } from './pages/Home';
 // Main Pages
@@ -48,6 +47,11 @@ import AuthCallback from './pages/AuthCallback';
 import HomeGames from './pages/Admin/HomeGames';
 
 function App() {
+  // Initialize SEO monitoring
+  useEffect(() => {
+    initSEOMonitoring();
+  }, []);
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gray-900 text-white">

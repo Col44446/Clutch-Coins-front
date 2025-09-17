@@ -1,4 +1,5 @@
 import React from 'react'
+import SEOHead from '../components/common/SEOHead'
 import MainCard from "../components/Home/mainCard"
 import Offers from '../components/Home/Offers'
 import PopularGames from '../components/Home/PopularGame'
@@ -9,7 +10,26 @@ import GameCard from '../components/Home/moreGame';
 import PaymentSlider from '../components/Home/paymentSlider';
 export const Home = () => {
   return (
-    <div className="min-h-screen pt-3   ">
+    <>
+      <SEOHead 
+        title="ClutchCoins - Instant Gaming Recharge & Top-Up Platform"
+        description="Get lightning-fast gaming recharge and top-up services for popular games like PUBG, Valorant, Roblox, and more. Secure payments, instant delivery, and exclusive bonuses!"
+        keywords="gaming recharge, game top-up, mobile gaming, PUBG UC, Valorant points, Roblox Robux, Minecraft coins, gaming credits, instant recharge, secure gaming payments"
+        url="https://clutchcoins.com/"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "ClutchCoins",
+          "description": "Instant gaming recharge and top-up platform",
+          "url": "https://clutchcoins.com",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://clutchcoins.com/games?search={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }}
+      />
+      <div className="min-h-screen pt-3   ">
       <MainCard />
       <PopularGames />
       <section
@@ -51,5 +71,6 @@ export const Home = () => {
       <GameCard />
       <PaymentSlider />
     </div>
+    </>
   )
 }

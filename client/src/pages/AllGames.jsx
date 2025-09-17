@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Helmet } from 'react-helmet';
+import SEOHead from '../components/common/SEOHead';
 import axios from 'axios';
 
 function AllGames() {
@@ -82,34 +82,32 @@ function AllGames() {
 
   return (
     <>
-      <Helmet>
-        <title>All Games - Game Zone</title>
-        <meta name="description" content="Explore all games in Game Zone, sorted alphabetically. Find your favorite games by title." />
-        <meta name="keywords" content="games, game zone, all games, alphabetic order" />
-        <meta property="og:title" content="All Games - Game Zone" />
-        <meta property="og:description" content="Browse our collection of games sorted alphabetically with compact interactive cards." />
-        <meta property="og:type" content="website" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            "itemListElement": games.map((game, index) => ({
-              "@type": "ListItem",
-              "position": index + 1,
-              "item": {
-                "@type": "Game",
-                "name": game.title,
-                "image": game.image || '',
-                "publisher": {
-                  "@type": "Organization",
-                  "name": game.publisher || ''
-                }
-              }
-            }))
-          })}
-        </script>
-      </Helmet>
+      <SEOHead 
+        title="All Games - ClutchCoins Gaming Hub"
+        description="Browse our complete collection of games for instant recharge and top-up. Find PUBG, Valorant, Roblox, Minecraft and more games sorted alphabetically."
+        keywords="all games, gaming recharge, PUBG UC, Valorant points, Roblox Robux, game top-up, mobile games, PC games, gaming credits"
+        url="https://clutchcoins.com/games"
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "name": "ClutchCoins Games Collection",
+          "description": "Complete collection of games available for recharge and top-up",
+          "itemListElement": games.map((game, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "item": {
+              "@type": "VideoGame",
+              "name": game.title,
+              "image": game.image || '',
+              "publisher": {
+                "@type": "Organization",
+                "name": game.publisher || 'Unknown Publisher'
+              },
+              "url": `https://clutchcoins.com/games/${game._id}`
+            }
+          }))
+        }}
+      />
       <div className="min-h-screen bg-gray-900 text-white">
         <main className=" container mx-auto p-3 sm:p-4 md:p-6">
           <motion.div

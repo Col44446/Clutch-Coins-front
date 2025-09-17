@@ -1,0 +1,36 @@
+User-agent: *
+Allow: /
+
+# Allow search engines to crawl all public pages
+Allow: /games
+Allow: /blogs
+Allow: /about
+Allow: /faq
+Allow: /guide
+Allow: /payments
+Allow: /shipping
+Allow: /privacy
+Allow: /terms
+Allow: /returns
+
+# Disallow admin and user-specific pages
+Disallow: /admin
+Disallow: /admin-dashboard
+Disallow: /user-dashboard
+Disallow: /account
+Disallow: /cart
+Disallow: /login
+Disallow: /signup
+Disallow: /otp-verify
+Disallow: /auth/callback
+Disallow: /payment
+Disallow: /purchase-success
+
+# Disallow API endpoints
+Disallow: /api/
+
+# Crawl delay (optional - 1 second between requests)
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://clutchcoins.com/sitemap.xml
