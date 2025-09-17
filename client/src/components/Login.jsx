@@ -41,7 +41,7 @@ const Login = ({ onClose, onSwitch, onLogin }) => {
         setTimeout(() => {
           setSuccessPopup(false);
           if (typeof onLogin === "function") onLogin();
-          const target = isAdmin ? "/admin-dashboard" : "/user-dashboard";
+          const target = isAdmin ? "/admin-dashboard" : "/account";
           navigate(target, { replace: true });
           onClose?.();
         }, 1500);

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet';
+import { useNavigate } from 'react-router-dom';
+import { showToast } from '../../components/common/Toast';
 import { 
   FaUser, 
   FaHistory, 
@@ -13,10 +15,12 @@ import {
   FaSave,
   FaTimes,
   FaCheckCircle,
-  FaExclamationTriangle
+  FaExclamationTriangle,
+  FaSignOutAlt
 } from 'react-icons/fa';
 
 const AccountPage = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,6 +28,7 @@ const AccountPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', email: '' });
   const [popup, setPopup] = useState({ show: false, type: '', title: '', message: '' });
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -47,6 +52,32 @@ const AccountPage = () => {
     setTimeout(() => {
       setPopup({ show: false, type: '', title: '', message: '' });
     }, 4000);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      const url = role === "admin"
+        ? `${import.meta.env.VITE_API_BASE_URL}/api/admin/logout`
+        : `${import.meta.env.VITE_API_BASE_URL}/api/users/logout`;
+      
+      await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        credentials: "include",
+      });
+      
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      window.dispatchEvent(new Event('authStateChanged'));
+      
+      // Show success toast and navigate after a brief delay
+      showToast('Successfully logged out', 'success');
+      setTimeout(() => navigate("/"), 1000);
+    } catch (error) {
+      showPopup('error', 'Logout Failed', 'There was an error logging out. Please try again.');
+    }
   };
 
   const closePopup = () => setPopup({ show: false, type: '', title: '', message: '' });
@@ -326,6 +357,19 @@ const AccountPage = () => {
                     <p className="text-cyan-400 font-bold text-lg">{purchases.length}</p>
                   </div>
                 </div>
+
+                {/* Logout Button */}
+                <div className="mt-6 pt-6 border-t border-gray-700">
+                  <motion.button
+                    onClick={() => setShowLogoutConfirm(true)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+                  >
+                    <FaSignOutAlt />
+                    Logout
+                  </motion.button>
+                </div>
               </div>
             </motion.div>
 
@@ -403,6 +447,52 @@ const AccountPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <AnimatePresence>
+        {showLogoutConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-gray-800 p-6 rounded-lg shadow-xl max-w-sm w-full border border-gray-700"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <FaSignOutAlt className="w-6 h-6 text-red-400" />
+                <h3 className="text-lg font-semibold text-white">Confirm Logout</h3>
+              </div>
+              <p className="text-gray-400 mb-6">Are you sure you want to logout?</p>
+              <div className="flex justify-end gap-3">
+                <motion.button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
+                >
+                  Cancel
+                </motion.button>
+                <motion.button
+                  onClick={() => {
+                    setShowLogoutConfirm(false);
+                    handleLogout();
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Logout
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {popup.show && (
         <AnimatePresence>

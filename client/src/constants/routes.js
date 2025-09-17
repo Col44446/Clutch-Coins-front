@@ -16,7 +16,7 @@ export const ROUTES = {
   RETURNS: '/returns',
   
   // User routes
-  USER_DASHBOARD: '/user-dashboard',
+  USER_PROFILE: '/account',
   
   // Admin routes
   ADMIN_DASHBOARD: '/admin-dashboard',

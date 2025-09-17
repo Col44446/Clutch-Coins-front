@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, AlertCircle, MessageCircle, Search, User, UserPlus, ShoppingCart } from "lucide-react";
+import { MessageCircle, Search, User, UserPlus, ShoppingCart } from "lucide-react";
 import Signup from "../LogSign";
 import Login from "../Login";
 import Messages from "../Messages";
+import ProfileDropdown from "./ProfileDropdown";
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
-  const [showLogoutWarning, setShowLogoutWarning] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [cartItems, setCartItems] = useState([]);
@@ -46,34 +46,6 @@ function Header() {
   const openSignup = () => setModalType("signup");
   const openLogin = () => setModalType("login");
   const closeModal = () => setModalType(null);
-  const handleLogout = () => setShowLogoutWarning(true);
-
-  const confirmLogout = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const role = localStorage.getItem("role");
-      const url =
-        role === "admin"
-          ? `${import.meta.env.VITE_API_BASE_URL}/api/admin/logout`
-          : `${import.meta.env.VITE_API_BASE_URL}/api/users/logout`;
-      await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        credentials: "include",
-      });
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      setIsAuthenticated(false);
-      setShowLogoutWarning(false);
-      setShowChat(false);
-      setIsOpen(false);
-      navigate("/");
-    } catch (error) {
-      console.error("❌ Logout failed:", error);
-    }
-  };
-
-  const cancelLogout = () => setShowLogoutWarning(false);
 
   const handleChatClick = () => {
     if (!isAuthenticated) {
@@ -120,7 +92,7 @@ function Header() {
   const navItems = [
     { to: "/games", label: "Games" },
     { to: "/about", label: "About" },
-    ...(isAuthenticated ? [{ to: role === "admin" ? "/admin-dashboard" : "/user-dashboard", label: "Dashboard" }] : []),
+    ...(isAuthenticated ? [{ to: "/account", label: "Profile" }] : []),
   ];
 
   const menuVariants = {
@@ -140,11 +112,6 @@ function Header() {
   const hamburgerVariants = {
     closed: { rotate: 0 },
     open: { rotate: 90, transition: { duration: 0.2 } },
-  };
-
-  const warningVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.2 } },
   };
 
   const chatButtonVariants = {
@@ -186,7 +153,6 @@ function Header() {
                 <MessageCircle className="w-4 h-4" />
                 <span>Chat</span>
               </motion.button>
-              
               <motion.button
                 onClick={toggleMenu}
                 className="md:hidden text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 rounded p-1"
@@ -235,13 +201,13 @@ function Header() {
                   </div>
                   {isAuthenticated ? (
                     <motion.button
-                      onClick={handleLogout}
+                      onClick={() => navigate("/account")}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className="flex items-center gap-1 text-white text-xs font-medium hover:text-cyan-300"
                     >
-                      <LogOut className="w-4 h-4" />
-                      Logout
+                      <User className="w-4 h-4" />
+                      Profile
                     </motion.button>
                   ) : (
                     <div className="flex gap-2">
@@ -304,15 +270,7 @@ function Header() {
                       </span>
                     )}
                   </motion.button>
-                  <motion.button
-                    onClick={handleLogout}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-1 text-white text-xs font-medium hover:text-cyan-300"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Logout
-                  </motion.button>
+                  <ProfileDropdown userName={localStorage.getItem('userName') || 'User'} />
                 </div>
               ) : (
                 <div className="flex items-center gap-1">
@@ -364,7 +322,6 @@ function Header() {
                   &times;
                 </button>
               </div>
-              
               <div className="max-h-96 overflow-y-auto">
                 {cartItems.length === 0 ? (
                   <p className="text-gray-300 text-center py-8">Your cart is empty</p>
@@ -393,7 +350,6 @@ function Header() {
                   </div>
                 )}
               </div>
-              
               {cartItems.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-gray-600">
                   <div className="flex justify-between items-center mb-3">
@@ -474,48 +430,6 @@ function Header() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {showLogoutWarning && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-60 flex items-center justify-center px-4"
-          >
-            <motion.div
-              variants={warningVariants}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              className="bg-gradient-to-b from-blue-900 to-slate-950 p-4 rounded-lg shadow-xl max-w-xs w-full"
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <AlertCircle className="w-5 h-5 text-yellow-400" />
-                <h3 className="text-base font-semibold text-white">Confirm Logout</h3>
-              </div>
-              <p className="text-xs text-gray-300 mb-4">Do you want to logout?</p>
-              <div className="flex justify-end gap-2">
-                <motion.button
-                  onClick={cancelLogout}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-3 py-1 bg-gray-600 text-white rounded text-xs"
-                >
-                  No
-                </motion.button>
-                <motion.button
-                  onClick={confirmLogout}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-3 py-1 bg-red-600 text-white rounded text-xs"
-                >
-                  Yes
-                </motion.button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

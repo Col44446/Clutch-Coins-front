@@ -47,7 +47,7 @@ const AuthCallback = () => {
           window.dispatchEvent(new CustomEvent('authStateChanged'));
           
           // Redirect based on role
-          const redirectPath = data.user.role === 'admin' ? '/admin-dashboard' : '/user-dashboard';
+          const redirectPath = data.user.role === 'admin' ? '/admin-dashboard' : '/account';
           navigate(redirectPath, { replace: true });
         } else {
           throw new Error('Invalid user data');

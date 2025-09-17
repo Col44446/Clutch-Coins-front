@@ -4,6 +4,7 @@ import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import CustomScrollbar from "./components/common/CustomScrollbar";
+import { ToastManager } from './components/common/Toast';
 import { initSEOMonitoring } from './utils/seoMonitor';
 import './App.css';
 import { Home } from './pages/Home';
@@ -14,7 +15,6 @@ import CartPage from './pages/Cart/CartPage';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 
 // Common Components
-import UserDashboard from "./pages/User/UserDashboard";
 import CreateBlog from "./pages/Admin/PostBlog";
 import AddGame from "./pages/Admin/addGame";
 import AllGames from "./pages/Admin/AllGames";
@@ -64,7 +64,6 @@ function App() {
         <Route path="/otp-verify" element={<OTPVerify />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/blogs" element={<BlogsList />} />
-        <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/account" element={<AccountPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/games" element={<AllGame />} />
@@ -97,11 +96,12 @@ function App() {
 
         {/* 404 Catch-all route */}
         <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Footer />
-      <CustomScrollbar />
-    </div>
-    </ErrorBoundary>
+        </Routes>
+        <Footer />
+        <CustomScrollbar />
+        <ToastManager />
+      </div>
+      </ErrorBoundary>
   );
 }
 
